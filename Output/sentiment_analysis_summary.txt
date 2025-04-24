@@ -1,0 +1,69 @@
+===== SENTIMENT ANALYSIS SUMMARY =====
+Total reviews analyzed: 1000
+Positive reviews: 467 (46.7%)
+Negative reviews: 533 (53.3%)
+
+===== MOST COMMON WORDS =====
+Most common words in POSITIVE reviews:
+  - film: 737
+  - movie: 716
+  - one: 489
+  - like: 326
+  - good: 258
+  - see: 245
+  - great: 239
+  - well: 237
+  - story: 230
+  - time: 224
+
+Most common words in NEGATIVE reviews:
+  - movie: 1074
+  - film: 821
+  - one: 520
+  - like: 478
+  - even: 347
+  - would: 289
+  - good: 282
+  - see: 280
+  - bad: 278
+  - really: 268
+
+===== IMPORTANT TERMS (TF-IDF) =====
+Most important terms in POSITIVE reviews:
+  - movie: 0.0769
+  - film: 0.0735
+  - like: 0.0371
+  - good: 0.0330
+  - great: 0.0328
+  - story: 0.0328
+  - just: 0.0327
+  - really: 0.0277
+  - time: 0.0273
+  - movies: 0.0261
+
+Most important terms in NEGATIVE reviews:
+  - movie: 0.0918
+  - film: 0.0684
+  - just: 0.0439
+  - like: 0.0414
+  - bad: 0.0357
+  - good: 0.0325
+  - really: 0.0314
+  - story: 0.0284
+  - time: 0.0268
+  - don: 0.0264
+
+===== REVIEW LENGTH ANALYSIS =====
+Average length of POSITIVE reviews: 1307.4 characters
+Average length of NEGATIVE reviews: 1312.4 characters
+
+===== AI GENERATED SUMMARIES =====
+
+POSITIVE REVIEWS SUMMARY:
+The positive reviews, comprising 46.7% of total feedback, reveal a strong appreciation for the quality and enjoyment of the films, as demonstrated by the frequent use of terms like "movie," "film," "good," and "great." Customers consistently praised the films, highlighting them as enjoyable and well-crafted, with "film" and "movie" being the most repeated words, indicating a strong focus and satisfaction with the cinematic experience. The average review length of 1307.4 characters suggests that customers were eager to provide detailed feedback, often emphasizing individual movie experiences and overall production excellence. The pattern of positive reviews underscores the films' ability to resonate emotionally with audiences, delivering content that is both engaging and satisfying.
+
+NEGATIVE REVIEWS SUMMARY:
+The analysis of negative reviews reveals a significant dissatisfaction with the movie, as highlighted by frequent use of terms like "movie" and "film," indicating general disappointment with the content. The prominent presence of words such as "just," "like," and "bad" suggests that many viewers found the movie to fall short of expectations, possibly due to unoriginal or poorly executed elements. The recurring mention of "one" and "even" points to a perception of inadequacy or frustration with specific aspects that failed to deliver. With an average review length of 1312.4 characters, customers are likely articulating detailed grievances. Key issues include a lack of originality and poor execution, which are critical areas for improvement to enhance viewer satisfaction and reduce negative feedback.
+
+OVERALL SUMMARY:
+The sentiment analysis of 1,000 customer reviews reveals a slight predominance of negative reviews at 53.3%, compared to 46.7% positive ones. Both positive and negative reviews frequently mention "movie" and "film," indicating these are central to the discussions, but the sentiment diverges with adjectives like "good" and "great" characterizing positivity, while "bad" is prevalent in negative contexts. Notably, the word "just" appears more in negative feedback, suggesting a dismissive tone. The average length of reviews is nearly identical, indicating that the depth of detail is not a major differentiator in sentiment. To enhance customer satisfaction, it would be prudent to address specific negative sentiments by conducting deeper qualitative analysis to identify common themes or issues, such as plot clarity or character development, that could be contributing to dissatisfaction. Additionally, leveraging the positive feedback to understand what aspects are resonating well with audiences can help in refining and marketing future films to align more closely with audience expectations.
