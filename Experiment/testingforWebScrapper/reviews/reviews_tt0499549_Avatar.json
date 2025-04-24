@@ -1,5 +1,15 @@
 {
     "ImdbId": "tt0499549",
-    "total_reviews": 0,
-    "reviews": []
+    "total_reviews": 1,
+    "reviews": [
+        {
+            "reviewer_name": "",
+            "reviewer_url": "",
+            "data-review-id": "__next",
+            "short_review": "After a decade, Cameron sets the avatar of our new generation",
+            "full_review": "",
+            "review_date": "Dec 13, 2009",
+            "rating_value": ""
+        }
+    ]
 }
