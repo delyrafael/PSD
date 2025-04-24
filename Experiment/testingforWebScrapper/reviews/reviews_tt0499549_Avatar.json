@@ -1,15 +1,366 @@
 {
     "ImdbId": "tt0499549",
-    "total_reviews": 1,
+    "total_reviews": 45,
     "reviews": [
         {
-            "reviewer_name": "",
-            "reviewer_url": "",
-            "data-review-id": "__next",
-            "short_review": "After a decade, Cameron sets the avatar of our new generation",
-            "full_review": "",
+            "reviewer_name": "Misagh",
+            "reviewer_url": "/user/ur13407466/?ref_=tturv_usr_1_t",
             "review_date": "Dec 13, 2009",
-            "rating_value": ""
+            "rating_value": "8",
+            "short_review": "After a decade, Cameron sets the avatar of our new generation",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "Samiam3",
+            "reviewer_url": "/user/ur19511193/?ref_=tturv_usr_2_t",
+            "review_date": "Dec 12, 2009",
+            "rating_value": "9",
+            "short_review": "Cameron Returns",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "ClaytonDavis",
+            "reviewer_url": "/user/ur2898980/?ref_=tturv_usr_3_t",
+            "review_date": "Dec 14, 2009",
+            "rating_value": "8",
+            "short_review": "One of the best cinematic experiences ever...",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "eldreddsouza",
+            "reviewer_url": "/user/ur78310344/?ref_=tturv_usr_5_t",
+            "review_date": "Sep 23, 2022",
+            "rating_value": "10",
+            "short_review": "It's an experience! A magical one.",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "cyberjedi-608-518993",
+            "reviewer_url": "/user/ur22532965/?ref_=tturv_usr_6_t",
+            "review_date": "Dec 14, 2009",
+            "rating_value": "10",
+            "short_review": "Best movie experience of the last 30 years...",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "lionel-14",
+            "reviewer_url": "/user/ur2064686/?ref_=tturv_usr_7_t",
+            "review_date": "Dec 12, 2009",
+            "rating_value": "10",
+            "short_review": "Fascinating concept .Must be seen cannot be described",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "fnet_florent",
+            "reviewer_url": "/user/ur10656343/?ref_=tturv_usr_8_t",
+            "review_date": "Dec 21, 2009",
+            "rating_value": "6",
+            "short_review": "Visually stunning, but ultimately unimaginative",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "yoel-47650",
+            "reviewer_url": "/user/ur68961762/?ref_=tturv_usr_9_t",
+            "review_date": "Nov 18, 2022",
+            "rating_value": "9",
+            "short_review": "A fantastic journey.",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "benjamin-heckendorn",
+            "reviewer_url": "/user/ur22561863/?ref_=tturv_usr_10_t",
+            "review_date": "Dec 20, 2009",
+            "rating_value": "6",
+            "short_review": "How could anyone who's seen more than 4 movies in their life find this creative?",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "suhanime",
+            "reviewer_url": "/user/ur150616236/?ref_=tturv_usr_11_t",
+            "review_date": "Mar 9, 2022",
+            "rating_value": "8",
+            "short_review": "A great science fiction adventure from a master filmmaker!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "TheLittleSongbird",
+            "reviewer_url": "/user/ur20552756/?ref_=tturv_usr_12_t",
+            "review_date": "Aug 6, 2010",
+            "rating_value": "6",
+            "short_review": "Visually mind-blowing, but lacking in the story",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "NonSequiturL",
+            "reviewer_url": "/user/ur16237357/?ref_=tturv_usr_14_t",
+            "review_date": "Dec 16, 2009",
+            "rating_value": "9",
+            "short_review": "Incredible scope and spectacle",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "ftyl",
+            "reviewer_url": "/user/ur5378817/?ref_=tturv_usr_15_t",
+            "review_date": "Dec 15, 2009",
+            "rating_value": "9",
+            "short_review": "The best blockbuster in years - the master is back!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "shaikhirshad-41223",
+            "reviewer_url": "/user/ur99503134/?ref_=tturv_usr_16_t",
+            "review_date": "Sep 23, 2022",
+            "rating_value": "10",
+            "short_review": "A NEW WORLD.....",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "MorganGrodecki",
+            "reviewer_url": "/user/ur8152215/?ref_=tturv_usr_17_t",
+            "review_date": "Dec 18, 2009",
+            "rating_value": "10",
+            "short_review": "Avatar - Breathtakingly Beautiful",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "NoArrow",
+            "reviewer_url": "/user/ur1903880/?ref_=tturv_usr_18_t",
+            "review_date": "Jan 1, 2010",
+            "rating_value": "6",
+            "short_review": "Looks great, I just wish I cared what happened in it",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "hutchinson_3",
+            "reviewer_url": "/user/ur3278830/?ref_=tturv_usr_19_t",
+            "review_date": "Dec 22, 2009",
+            "rating_value": "6",
+            "short_review": "Visually amazing, but otherwise average at best",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "miruleyall",
+            "reviewer_url": "/user/ur18853862/?ref_=tturv_usr_20_t",
+            "review_date": "Dec 16, 2009",
+            "rating_value": "8",
+            "short_review": "Visually Spellbinding!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "Bart_Mancuso",
+            "reviewer_url": "/user/ur9034138/?ref_=tturv_usr_21_t",
+            "review_date": "Dec 22, 2009",
+            "rating_value": "1",
+            "short_review": "This movie made me feel blue",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "Radio-1s_Mr-MovieMad-Ami_104-1FM",
+            "reviewer_url": "/user/ur77586437/?ref_=tturv_usr_23_t",
+            "review_date": "Sep 22, 2019",
+            "rating_value": "10",
+            "short_review": "\" FI ( LM ) NOMENAL \" 💎 💎❗❗❗",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "goldeneyeonline",
+            "reviewer_url": "/user/ur22572201/?ref_=tturv_usr_24_t",
+            "review_date": "Dec 22, 2009",
+            "rating_value": "9",
+            "short_review": "Masterpiece for eye and soul...",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "canuck15",
+            "reviewer_url": "/user/ur22600186/?ref_=tturv_usr_25_t",
+            "review_date": "Dec 27, 2009",
+            "rating_value": "10",
+            "short_review": "Escapism at it's best",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "vjlbym",
+            "reviewer_url": "/user/ur22575297/?ref_=tturv_usr_26_t",
+            "review_date": "Dec 22, 2009",
+            "rating_value": "10",
+            "short_review": "I watched it twice within 24 hours!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "suckerdwsp316",
+            "reviewer_url": "/user/ur2372821/?ref_=tturv_usr_27_t",
+            "review_date": "Dec 20, 2009",
+            "rating_value": "6",
+            "short_review": "There is So Much to Say About James Cameron's AVATAR",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "nofoodu",
+            "reviewer_url": "/user/ur22618335/?ref_=tturv_usr_28_t",
+            "review_date": "Dec 30, 2009",
+            "rating_value": "10",
+            "short_review": "Its too god to be true",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "willandthomas-picturehou",
+            "reviewer_url": "/user/ur16596626/?ref_=tturv_usr_29_t",
+            "review_date": "Feb 8, 2010",
+            "rating_value": "7",
+            "short_review": "7 For Chutzpah",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "JoshuaParis",
+            "reviewer_url": "/user/ur22709325/?ref_=tturv_usr_30_t",
+            "review_date": "Jan 19, 2010",
+            "rating_value": "8",
+            "short_review": "Welcome to Pandora",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "in_chainsagain",
+            "reviewer_url": "/user/ur3929021/?ref_=tturv_usr_31_t",
+            "review_date": "Dec 21, 2009",
+            "rating_value": "6",
+            "short_review": "Masterpiece or Pocahontas in Space?",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "tomskaal",
+            "reviewer_url": "/user/ur20287260/?ref_=tturv_usr_32_t",
+            "review_date": "Dec 21, 2009",
+            "rating_value": "1",
+            "short_review": "Extremely predictable and very unoriginal!!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "moonscore",
+            "reviewer_url": "/user/ur3479888/?ref_=tturv_usr_33_t",
+            "review_date": "Dec 18, 2009",
+            "rating_value": "10",
+            "short_review": "A spectacle for our time, for all time...",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "ithmaril",
+            "reviewer_url": "/user/ur5441645/?ref_=tturv_usr_34_t",
+            "review_date": "Dec 17, 2009",
+            "rating_value": "10",
+            "short_review": "It feels so good to be a fanboy again.",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "pippin_evil_genius",
+            "reviewer_url": "/user/ur7626893/?ref_=tturv_usr_35_t",
+            "review_date": "Dec 20, 2009",
+            "rating_value": "10",
+            "short_review": "Avatar: Once in a lifetime film making",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "petr-42",
+            "reviewer_url": "/user/ur16329412/?ref_=tturv_usr_36_t",
+            "review_date": "Dec 22, 2009",
+            "rating_value": "10",
+            "short_review": "King of the world?... No! .... Master of the universe!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "Quinoa1984",
+            "reviewer_url": "/user/ur0453068/?ref_=tturv_usr_37_t",
+            "review_date": "Dec 19, 2009",
+            "rating_value": "6",
+            "short_review": "Mr so-called \"King of the World\" returns with a visually dazzling spectacle and so-so story",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "URBestFriend4Ever1",
+            "reviewer_url": "/user/ur5177230/?ref_=tturv_usr_38_t",
+            "review_date": "Dec 19, 2009",
+            "rating_value": "10",
+            "short_review": "Avatar is a Cinematic Experience !",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "zuma777",
+            "reviewer_url": "/user/ur20274624/?ref_=tturv_usr_40_t",
+            "review_date": "Jan 4, 2010",
+            "rating_value": "7",
+            "short_review": "Thank You Mr. Cameron",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "rettercritical",
+            "reviewer_url": "/user/ur10427060/?ref_=tturv_usr_41_t",
+            "review_date": "Dec 16, 2009",
+            "rating_value": "10",
+            "short_review": "AVATAR has a soul",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "LumanoidAU",
+            "reviewer_url": "/user/ur18553033/?ref_=tturv_usr_42_t",
+            "review_date": "Dec 16, 2009",
+            "rating_value": "6",
+            "short_review": "If you thought Jurrasic Park was your favorite childhood fantasy adventure film, then imagine how children today are going to feel about this!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "mlbstellar",
+            "reviewer_url": "/user/ur22655468/?ref_=tturv_usr_43_t",
+            "review_date": "Jan 5, 2010",
+            "rating_value": "1",
+            "short_review": "The Most Unoriginal Film of the Decade",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "Znukkas",
+            "reviewer_url": "/user/ur11733401/?ref_=tturv_usr_44_t",
+            "review_date": "Dec 18, 2022",
+            "rating_value": "10",
+            "short_review": "A mustsee masterpiece!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "florianwebner-94771",
+            "reviewer_url": "/user/ur152686370/?ref_=tturv_usr_45_t",
+            "review_date": "Dec 19, 2022",
+            "rating_value": "10",
+            "short_review": "Just the best Cinema experience on this planet",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "Ali-hi42",
+            "reviewer_url": "/user/ur28919344/?ref_=tturv_usr_46_t",
+            "review_date": "Jul 13, 2020",
+            "rating_value": "10",
+            "short_review": "11/10",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "jaykchan",
+            "reviewer_url": "/user/ur16371618/?ref_=tturv_usr_47_t",
+            "review_date": "Dec 19, 2009",
+            "rating_value": "10",
+            "short_review": "Stunning visuals and an \"OK\" story!",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "CihanVercan",
+            "reviewer_url": "/user/ur19658928/?ref_=tturv_usr_49_t",
+            "review_date": "Dec 19, 2009",
+            "rating_value": "7",
+            "short_review": "Putting perfect Visuals and Virtualities aside, going deep into the Avatar's concept",
+            "data-review-id": ""
+        },
+        {
+            "reviewer_name": "PerpetuumMobile09",
+            "reviewer_url": "/user/ur22130130/?ref_=tturv_usr_50_t",
+            "review_date": "Jan 11, 2010",
+            "rating_value": "10",
+            "short_review": "A grand cinematic experience",
+            "data-review-id": ""
         }
     ]
 }
