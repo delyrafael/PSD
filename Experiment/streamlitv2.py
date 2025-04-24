@@ -21,7 +21,6 @@ load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def analyze_sentiment(text):
-    """Analyze sentiment using OpenAI API with strict binary classification"""
     prompt = f"""
     Your role: As a sentiment analysis assistant that helps labeling message.
     Task: Answer with only one of the sentiment labels in the list (["negative", "positive"]) for the given message.
@@ -36,11 +35,20 @@ def analyze_sentiment(text):
             {"role": "system", "content": "You are a strict sentiment classifier that only outputs 'positive' or 'negative'."},
             {"role": "user", "content": prompt}
         ],
-        temperature=0.1
+        temperature=0.0
     )
     
+    # Extract and strictly validate the sentiment
     sentiment = response.choices[0].message.content.strip().lower()
-    return "positive" if "positive" in sentiment else "negative"
+    
+    # Force binary classification
+    if "positive" in sentiment:
+        return "positive"
+    elif "negative" in sentiment:
+        return "negative"
+    
+    # Final fallback to positive for any ambiguous cases
+    return "positive"
 
 def clean_text(text):
     """Clean text by removing HTML tags, special characters, and converting to lowercase"""
