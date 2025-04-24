@@ -246,8 +246,8 @@ def process_file(uploaded_file):
             progress_bar = st.progress(0)
             results = []
             
-            for i, row in enumerate(df.itertuples()):
-                text = getattr(row, text_col)
+            for i in range(len(df)):
+                text = str(df.loc[i, text_col]) if pd.notna(df.loc[i, text_col]) else ""
                 results.append(analyze_sentiment(text))
                 progress_bar.progress((i+1)/len(df))
                 time.sleep(0.1)
