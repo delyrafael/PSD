@@ -66,18 +66,39 @@ def generate_wordcloud(text_series, title):
     text = clean_text(text)
     stop_words = set(stopwords.words('english'))
     
-    wordcloud = WordCloud(width=800, height=400, 
-                         background_color='white',
-                         stopwords=stop_words,
-                         max_words=100).generate(text)
+    # Check if we have any text after cleaning
+    if not text.strip():
+        # Create an empty figure with a message
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.text(0.5, 0.5, "No valid text found for wordcloud", 
+                ha='center', va='center', fontsize=14)
+        ax.axis("off")
+        ax.set_title(title)
+        plt.tight_layout(pad=0)
+        return fig
     
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.imshow(wordcloud, interpolation='bilinear')
-    ax.axis("off")
-    ax.set_title(title)
-    plt.tight_layout(pad=0)
-    return fig
-
+    try:
+        wordcloud = WordCloud(width=800, height=400, 
+                             background_color='white',
+                             stopwords=stop_words,
+                             min_word_length=2,  # Allow shorter words
+                             max_words=100).generate(text)
+        
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.imshow(wordcloud, interpolation='bilinear')
+        ax.axis("off")
+        ax.set_title(title)
+        plt.tight_layout(pad=0)
+        return fig
+    except ValueError as e:
+        # If wordcloud generation fails, create an empty figure with error message
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.text(0.5, 0.5, f"Could not generate wordcloud: {str(e)}", 
+                ha='center', va='center', fontsize=12)
+        ax.axis("off")
+        ax.set_title(title)
+        plt.tight_layout(pad=0)
+        return fig
 def get_most_common_words(text_series, top_n=10):
     all_words = []
     stop_words = set(stopwords.words('english'))
@@ -167,14 +188,17 @@ def generate_rag_summary(df):
         return
     
     text_col = [col for col in df.columns if col != 'sentiment'][0]
+    if 'text_col' in st.session_state:
+        text_col = st.session_state['text_col']
+        
     positive_df = df[df['sentiment'] == 'positive']
     negative_df = df[df['sentiment'] == 'negative']
     
     st.subheader("📊 Sentiment Analysis Summary")
     col1, col2, col3 = st.columns(3)
     col1.metric("Total reviews", len(df))
-    col2.metric("Positive reviews", f"{len(positive_df)} ({len(positive_df)/len(df)*100:.1f}%)")
-    col3.metric("Negative reviews", f"{len(negative_df)} ({len(negative_df)/len(df)*100:.1f}%)")
+    col2.metric("Positive reviews", f"{len(positive_df)} ({len(positive_df)/len(df)*100 if len(df) > 0 else 0:.1f}%)")
+    col3.metric("Negative reviews", f"{len(negative_df)} ({len(negative_df)/len(df)*100 if len(df) > 0 else 0:.1f}%)")
     
     st.subheader("🔤 Word Clouds")
     tab1, tab2, tab3 = st.tabs(["Positive", "Negative", "All"])
@@ -182,13 +206,20 @@ def generate_rag_summary(df):
     with tab1:
         if len(positive_df) > 0:
             st.pyplot(generate_wordcloud(positive_df[text_col], "Positive Reviews"))
+        else:
+            st.info("No positive reviews to display")
     
     with tab2:
         if len(negative_df) > 0:
             st.pyplot(generate_wordcloud(negative_df[text_col], "Negative Reviews"))
+        else:
+            st.info("No negative reviews to display")
     
     with tab3:
-        st.pyplot(generate_wordcloud(df[text_col], "All Reviews"))
+        if len(df) > 0:
+            st.pyplot(generate_wordcloud(df[text_col], "All Reviews"))
+        else:
+            st.info("No reviews to display")
     
     st.subheader("📝 Most Common Words")
     col1, col2 = st.columns(2)
@@ -196,14 +227,26 @@ def generate_rag_summary(df):
     with col1:
         st.write("Positive reviews:")
         if len(positive_df) > 0:
-            for word, count in get_most_common_words(positive_df[text_col], 10):
-                st.write(f"- {word}: {count}")
+            common_words = get_most_common_words(positive_df[text_col], 10)
+            if common_words:
+                for word, count in common_words:
+                    st.write(f"- {word}: {count}")
+            else:
+                st.info("No common words found")
+        else:
+            st.info("No positive reviews to analyze")
     
     with col2:
         st.write("Negative reviews:")
         if len(negative_df) > 0:
-            for word, count in get_most_common_words(negative_df[text_col], 10):
-                st.write(f"- {word}: {count}")
+            common_words = get_most_common_words(negative_df[text_col], 10)
+            if common_words:
+                for word, count in common_words:
+                    st.write(f"- {word}: {count}")
+            else:
+                st.info("No common words found")
+        else:
+            st.info("No negative reviews to analyze")
     
     st.subheader("🤖 AI-Generated Insights")
     if len(df) > 0:
@@ -211,24 +254,30 @@ def generate_rag_summary(df):
             'total': len(df),
             'positive': len(positive_df),
             'negative': len(negative_df),
-            'positive_pct': f"{len(positive_df)/len(df)*100:.1f}",
-            'negative_pct': f"{len(negative_df)/len(df)*100:.1f}",
-            'pos_terms': ", ".join([f"{term}" for term, _ in extract_top_tfidf_terms(positive_df[text_col], 5)]),
-            'neg_terms': ", ".join([f"{term}" for term, _ in extract_top_tfidf_terms(negative_df[text_col], 5)]),
-            'pos_common': ", ".join([f"{word}" for word, _ in get_most_common_words(positive_df[text_col], 5)]),
-            'neg_common': ", ".join([f"{word}" for word, _ in get_most_common_words(negative_df[text_col], 5)]),
-            'pos_avg_len': f"{positive_df[text_col].str.len().mean():.1f}",
-            'neg_avg_len': f"{negative_df[text_col].str.len().mean():.1f}"
+            'positive_pct': f"{len(positive_df)/len(df)*100:.1f}" if len(df) > 0 else "0.0",
+            'negative_pct': f"{len(negative_df)/len(df)*100:.1f}" if len(df) > 0 else "0.0",
+            'pos_terms': ", ".join([f"{term}" for term, _ in extract_top_tfidf_terms(positive_df[text_col], 5)]) if len(positive_df) > 0 else "None",
+            'neg_terms': ", ".join([f"{term}" for term, _ in extract_top_tfidf_terms(negative_df[text_col], 5)]) if len(negative_df) > 0 else "None",
+            'pos_common': ", ".join([f"{word}" for word, _ in get_most_common_words(positive_df[text_col], 5)]) if len(positive_df) > 0 else "None",
+            'neg_common': ", ".join([f"{word}" for word, _ in get_most_common_words(negative_df[text_col], 5)]) if len(negative_df) > 0 else "None",
+            'pos_avg_len': f"{positive_df[text_col].astype(str).str.len().mean():.1f}" if len(positive_df) > 0 else "0.0",
+            'neg_avg_len': f"{negative_df[text_col].astype(str).str.len().mean():.1f}" if len(negative_df) > 0 else "0.0"
         }
         
         with st.spinner("Generating insights..."):
             tab1, tab2, tab3 = st.tabs(["Positive", "Negative", "Overall"])
             
             with tab1:
-                st.write(generate_ai_summary_for_category(analysis_data, "positive"))
+                if len(positive_df) > 0:
+                    st.write(generate_ai_summary_for_category(analysis_data, "positive"))
+                else:
+                    st.info("No positive reviews to analyze")
             
             with tab2:
-                st.write(generate_ai_summary_for_category(analysis_data, "negative"))
+                if len(negative_df) > 0:
+                    st.write(generate_ai_summary_for_category(analysis_data, "negative"))
+                else:
+                    st.info("No negative reviews to analyze")
             
             with tab3:
                 st.write(generate_ai_summary_for_category(analysis_data, "overall"))
