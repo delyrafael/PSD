@@ -61,7 +61,7 @@ def clean_text(text):
     return text
 
 def generate_wordcloud(text_series, title):
-    """Generate a word cloud from a series of texts"""
+    text_series = text_series.astype(str)
     text = ' '.join(text_series)
     text = clean_text(text)
     stop_words = set(stopwords.words('english'))
@@ -79,13 +79,12 @@ def generate_wordcloud(text_series, title):
     return fig
 
 def get_most_common_words(text_series, top_n=10):
-    """Extract most common words from a series of texts"""
     all_words = []
     stop_words = set(stopwords.words('english'))
     
     for text in text_series:
-        if not isinstance(text, str):
-            continue
+        # Convert to string if not already
+        text = str(text) if text is not None else ""
         cleaned_text = clean_text(text)
         tokens = word_tokenize(cleaned_text)
         words = [word for word in tokens if word.isalpha() and word not in stop_words]
@@ -95,8 +94,7 @@ def get_most_common_words(text_series, top_n=10):
     return word_counts.most_common(top_n)
 
 def extract_top_tfidf_terms(text_series, top_n=10):
-    """Extract most important terms using TF-IDF"""
-    cleaned_texts = [clean_text(text) if isinstance(text, str) else "" for text in text_series]
+    cleaned_texts = [clean_text(str(text)) if text is not None else "" for text in text_series]
     
     tfidf_vectorizer = TfidfVectorizer(max_features=1000, stop_words='english')
     
