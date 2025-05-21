@@ -13,7 +13,7 @@ from Crawling import (
     initialize_driver, search_movie_by_title, scrape_all_reviews,get_movie_reviews_by_title)
 
 from preposesing import (
-    clean_text, generate_wordcloud, categorize_sentiment, extract_common_phrases)
+    clean_text, generate_wordcloud, categorize_sentiment,analyze_sentiment, extract_common_phrases)
 
 
 # Set page configuration
@@ -265,6 +265,7 @@ def display_results_as_table():
         st.session_state.selected_index = selected_index
 
 # Display and analyze reviews if available
+
 if st.session_state.reviews_data and not st.session_state.loading:
     reviews = st.session_state.reviews_data['reviews']
     movie_info = st.session_state.selected_movie
@@ -281,7 +282,7 @@ if st.session_state.reviews_data and not st.session_state.loading:
             'rating': review.get('rating_value', 'Unknown'),
             'reviewer': review.get('reviewer_name', 'Anonymous'),
             'date': review.get('review_date', 'Unknown date'),
-            'sentiment': categorize_sentiment(review.get('rating_value'))
+            'sentiment': analyze_sentiment(review.get('full_review', ''))
         })
     
     df_reviews = pd.DataFrame(review_data)

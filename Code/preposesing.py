@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 # Function to clean text for analysis
@@ -50,8 +51,9 @@ def generate_wordcloud(text,title= None):
 
 
 # Load environment variables
-load_dotenv()
 
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 # Download necessary NLTK resources
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -130,6 +132,37 @@ def clean_text(text):
     # Remove extra spaces
     text = re.sub(r'\s+', ' ', text).strip()
     return text
+
+def analyze_sentiment(text):
+    prompt = f"""
+    Your role: As a sentiment analysis assistant that helps labeling message.
+    Task: Answer with only one of the sentiment labels in the list (["negative", "positive"]) for the given message.
+    STRICT RESTRICTION: You must answer only with either "positive" or "negative". 
+    If uncertain, choose the most likely label based on the overall tone.
+    Message: {text}
+    """
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a strict sentiment classifier that only outputs 'positive' or 'negative'."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.0
+    )
+    
+    # Extract and strictly validate the sentiment
+    sentiment = response.choices[0].message.content.strip().lower()
+    
+    # Force binary classification
+    if "positive" in sentiment:
+        return "positive"
+    elif "negative" in sentiment:
+        return "negative"
+    
+    # Final fallback to positive for any ambiguous cases
+    return "positive"
+
 
 def get_most_common_words(text_series, top_n=10):
     """Extract most common words from a series of texts"""
