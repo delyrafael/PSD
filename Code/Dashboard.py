@@ -544,7 +544,7 @@ if st.session_state.reviews_data and not st.session_state.loading:
                 st.write(overall_summary)
         
         # Display a note about OpenAI API usage
-        st.info("Note: These summaries are generated using OpenAI's API. Make sure you have set your API key in the environment variables for this feature to work properly.")
+        # st.info("Note: These summaries are generated using OpenAI's API. Make sure you have set your API key in the environment variables for this feature to work properly.")
 
 
     with tab5:
