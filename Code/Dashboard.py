@@ -106,40 +106,47 @@ if 'loading' not in st.session_state:
 
 # Create sidebar for search and options
 with st.sidebar:
-    st.header("Search Options")
-    
-    # Movie search
-    movie_title = st.text_input("Enter movie title:")
-    max_pages = st.number_input("Maximum pages to scrape (0 for all):", min_value=0, value=2)
-    if max_pages == 0:
-        max_pages = None
-    
-    # Search button
-    if st.button("Search Movies"):
-        if movie_title:
-            st.session_state.loading = True
+    openai_api_key = st.text_input("OpenAI API Key", type="password")
+    if not openai_api_key:
+        st.info("Please add your OpenAI API key to continue.", icon="🗝️")
+    else:
 
-            # Initialize driver
-            if not st.session_state.driver:
-                with st.spinner("Initializing browser..."):
-                    with capture_output() as (stdout, stderr):
-                        try:
-                            st.session_state.driver = initialize_driver()
-                        except Exception as e:
-                            st.error(f"Error initializing browser: {str(e)}")
-                            st.session_state.loading = False
-            
-            # Search for movies
-            if st.session_state.driver:
-                with st.spinner(f"Searching for '{movie_title}'..."):
-                    with capture_output() as (stdout, stderr):
-                        try:
-                            st.session_state.search_results = search_movie_by_title(movie_title, st.session_state.driver)
-                        except Exception as e:
-                            st.error(f"Error searching for movie: {str(e)}")
-                    st.session_state.loading = False
-        else:
-            st.warning("Please enter a movie title")
+        # Create an OpenAI client.
+        client = OpenAI(api_key=openai_api_key)
+        st.header("Search Options")
+        
+        # Movie search
+        movie_title = st.text_input("Enter movie title:")
+        max_pages = st.number_input("Maximum pages to scrape (0 for all):", min_value=0, value=2)
+        if max_pages == 0:
+            max_pages = None
+        
+        # Search button
+        if st.button("Search Movies"):
+            if movie_title:
+                st.session_state.loading = True
+    
+                # Initialize driver
+                if not st.session_state.driver:
+                    with st.spinner("Initializing browser..."):
+                        with capture_output() as (stdout, stderr):
+                            try:
+                                st.session_state.driver = initialize_driver()
+                            except Exception as e:
+                                st.error(f"Error initializing browser: {str(e)}")
+                                st.session_state.loading = False
+                
+                # Search for movies
+                if st.session_state.driver:
+                    with st.spinner(f"Searching for '{movie_title}'..."):
+                        with capture_output() as (stdout, stderr):
+                            try:
+                                st.session_state.search_results = search_movie_by_title(movie_title, st.session_state.driver)
+                            except Exception as e:
+                                st.error(f"Error searching for movie: {str(e)}")
+                        st.session_state.loading = False
+            else:
+                st.warning("Please enter a movie title")
 
 
 # Display search results and let user select a movie
