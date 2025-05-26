@@ -51,11 +51,13 @@ def generate_wordcloud(text,title= None):
 
 
 # Load environment variables
-
+api_key = st.session_state.get("api_key")
+    
+if not api_key:
+    raise ValueError("API Key tidak ditemukan!")
 # load_dotenv()
 # client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-openai_api_key = input("Input OpenAi Api Key")
-client = OpenAI(api_key=openai_api_key)
+client = OpenAI(api_key=api_key)
 # Download necessary NLTK resources
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
