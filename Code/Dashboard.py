@@ -106,7 +106,7 @@ if 'loading' not in st.session_state:
 
 # Create sidebar for search and options
 with st.sidebar:
-    openai_api_key = st.text_input("OpenAI API Key", type="password")
+    openai_api_key = input("Input OpenAI API Key )
     if not openai_api_key:
         st.info("Please add your OpenAI API key to continue.", icon="🗝️")
     else:
