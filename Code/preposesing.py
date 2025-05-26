@@ -12,6 +12,7 @@ import openai
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import streamlit as st  # Pastikan mengimpor streamlit
 # Function to clean text for analysis
 
 import re
