@@ -117,7 +117,7 @@ with st.sidebar:
     if st.button("Proses"):
         if "api_key" not in st.session_state:
             st.error("API Key belum dimasukkan!")
-        else
+        else:
             st.header("Search Options")
             
             # Movie search
