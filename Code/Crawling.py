@@ -56,7 +56,7 @@ import random
 import time
 from typing import Optional
 
-def initialize_driver():Add commentMore actions
+def initialize_driver():
     """Initialize and return a Selenium WebDriver"""
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
@@ -90,7 +90,7 @@ def initialize_driver():Add commentMore actions
                 });
                 
                 // Additional stealth setup
-                const originalQuery = window.navigator.permissions.query;Add commentMore actions
+                const originalQuery = window.navigator.permissions.query;
                 window.navigator.permissions.query = (parameters) => (
                     parameters.name === 'notifications' ?
                         Promise.resolve({state: Notification.permission}) :
