@@ -57,20 +57,46 @@ import time
 from typing import Optional
 
 def initialize_driver():
-    """Initialize and return a Selenium WebDriver"""
+    """Initialize and return a Selenium WebDriver optimized for Streamlit Cloud"""
+    import os
+    import sys
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.chrome.options import Options
+    import random
+    
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
+    
+    # Essential options for Streamlit Cloud
+    chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-web-security")
+    chrome_options.add_argument("--allow-running-insecure-content")
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-plugins")
+    chrome_options.add_argument("--disable-images")
+    chrome_options.add_argument("--disable-javascript")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--disable-background-timer-throttling")
+    chrome_options.add_argument("--disable-renderer-backgrounding")
+    chrome_options.add_argument("--disable-backgrounding-occluded-windows")
+    
+    # Streamlit Cloud specific
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--disable-dev-tools")
+    chrome_options.add_argument("--no-zygote")
+    chrome_options.add_argument("--disable-accelerated-2d-canvas")
+    chrome_options.add_argument("--memory-pressure-off")
+    chrome_options.add_argument("--max_old_space_size=4096")
     
     # Randomize user agent to avoid detection
     user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/109.0",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
     ]
     
     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
@@ -81,27 +107,106 @@ def initialize_driver():
     chrome_options.add_experimental_option("useAutomationExtension", False)
     
     try:
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
-        # Execute CDP command to bypass bot detection
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": """
-                Object.defineProperty(navigator, 'webdriver', {
-                    get: () => undefined
-                });
+        # Try different approaches to initialize the driver
+        driver = None
+        
+        # Method 1: Try using chromedriver-binary (if installed)
+        try:
+            import chromedriver_binary
+            driver = webdriver.Chrome(options=chrome_options)
+            logger.info("Successfully initialized driver using chromedriver-binary")
+        except ImportError:
+            pass
+        
+        # Method 2: Try using webdriver-manager (fallback)
+        if driver is None:
+            try:
+                from webdriver_manager.chrome import ChromeDriverManager
+                service = Service(ChromeDriverManager().install())
+                driver = webdriver.Chrome(service=service, options=chrome_options)
+                logger.info("Successfully initialized driver using webdriver-manager")
+            except Exception as e:
+                logger.warning(f"webdriver-manager failed: {e}")
+        
+        # Method 3: Try system chromedriver
+        if driver is None:
+            try:
+                # Look for system chromedriver
+                possible_paths = [
+                    "/usr/bin/chromedriver",
+                    "/usr/local/bin/chromedriver",
+                    "/opt/chrome/chromedriver",
+                    "chromedriver"
+                ]
                 
-                // Additional stealth setup
-                const originalQuery = window.navigator.permissions.query;
-                window.navigator.permissions.query = (parameters) => (
-                    parameters.name === 'notifications' ?
-                        Promise.resolve({state: Notification.permission}) :
-                        originalQuery(parameters)
-                );
-            """
-        })
+                for path in possible_paths:
+                    if os.path.exists(path) or path == "chromedriver":
+                        try:
+                            service = Service(path)
+                            driver = webdriver.Chrome(service=service, options=chrome_options)
+                            logger.info(f"Successfully initialized driver using system chromedriver at {path}")
+                            break
+                        except Exception as e:
+                            logger.debug(f"Failed to use chromedriver at {path}: {e}")
+                            continue
+            except Exception as e:
+                logger.warning(f"System chromedriver search failed: {e}")
+        
+        # Method 4: Last resort - try without explicit service
+        if driver is None:
+            try:
+                driver = webdriver.Chrome(options=chrome_options)
+                logger.info("Successfully initialized driver without explicit service")
+            except Exception as e:
+                logger.error(f"All driver initialization methods failed: {e}")
+                raise Exception("Could not initialize Chrome driver. Please check your Streamlit Cloud configuration.")
+        
+        # Execute CDP command to bypass bot detection
+        try:
+            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": """
+                    Object.defineProperty(navigator, 'webdriver', {
+                        get: () => undefined
+                    });
+                    
+                    // Additional stealth setup
+                    const originalQuery = window.navigator.permissions.query;
+                    window.navigator.permissions.query = (parameters) => (
+                        parameters.name === 'notifications' ?
+                            Promise.resolve({state: Notification.permission}) :
+                            originalQuery(parameters)
+                    );
+                """
+            })
+        except Exception as e:
+            logger.warning(f"Could not execute CDP commands: {e}")
+        
         return driver
+        
     except Exception as e:
         logger.error(f"Failed to initialize driver: {e}")
-        raise
+        
+        # Provide helpful error message for Streamlit Cloud
+        error_msg = f"""
+        Failed to initialize Chrome driver on Streamlit Cloud.
+        
+        To fix this, you need to:
+        1. Add these packages to your requirements.txt:
+           - selenium==4.15.0
+           - chromedriver-binary==114.0.5735.90
+        
+        2. Create a packages.txt file with:
+           chromium-browser
+           chromium-chromedriver
+        
+        3. Or alternatively, add to requirements.txt:
+           - webdriver-manager==4.0.1
+        
+        Error details: {e}
+        """
+        
+        logger.error(error_msg)
+        raise Exception(error_msg)
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
