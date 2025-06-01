@@ -1,1 +1,6 @@
 google-chrome-stable
+libgl1-mesa-glx
+libegl1-mesa
+libxrender1
+libxtst6
+libxext6
