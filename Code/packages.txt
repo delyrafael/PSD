@@ -1,2 +1,2 @@
-chromium-browser
+google-chrome-stable
 chromium-chromedriver
