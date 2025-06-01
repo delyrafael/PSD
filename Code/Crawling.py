@@ -36,21 +36,6 @@ import logging
 import base64
 from datetime import datetime
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
-
-import logging
-import random
-import time
-from typing import Optional
-
 import os
 import random
 import streamlit as st
@@ -100,36 +85,66 @@ def initialize_driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
     
-    # Set binary location for Streamlit Cloud
-    chrome_options.binary_location = "/usr/bin/chromium-browser"
+    # Try different binary locations for Chrome
+    possible_chrome_paths = [
+        "/usr/bin/google-chrome",
+        "/usr/bin/google-chrome-stable", 
+        "/usr/bin/chromium-browser",
+        "/usr/bin/chromium"
+    ]
+    
+    chrome_binary_found = False
+    for chrome_path in possible_chrome_paths:
+        if os.path.exists(chrome_path):
+            chrome_options.binary_location = chrome_path
+            chrome_binary_found = True
+            logger.info(f"Found Chrome binary at: {chrome_path}")
+            break
+    
+    if not chrome_binary_found:
+        logger.warning("No Chrome binary found, trying without explicit path")
     
     try:
         logger.info("Attempting to initialize Chrome WebDriver...")
         
-        # Method 1: Try with chromium-chromedriver from packages.txt
+        # Method 1: Try with selenium-manager (Selenium 4.6+)
         try:
-            service = Service("/usr/bin/chromedriver")
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            logger.info("Successfully initialized with system chromedriver")
+            driver = webdriver.Chrome(options=chrome_options)
+            logger.info("Successfully initialized with selenium-manager")
         except Exception as e1:
-            logger.warning(f"System chromedriver failed: {e1}")
+            logger.warning(f"Selenium-manager failed: {e1}")
             
-            # Method 2: Try without explicit service (let Selenium manage)
+            # Method 2: Try with webdriver-manager (fixed import)
             try:
-                driver = webdriver.Chrome(options=chrome_options)
-                logger.info("Successfully initialized with auto-managed driver")
-            except Exception as e2:
-                logger.warning(f"Auto-managed driver failed: {e2}")
+                from webdriver_manager.chrome import ChromeDriverManager
                 
-                # Method 3: Fallback to webdriver-manager
+                # Don't use ChromeType as it's not available in this version
+                driver_path = ChromeDriverManager().install()
+                service = Service(driver_path)
+                driver = webdriver.Chrome(service=service, options=chrome_options)
+                logger.info("Successfully initialized with webdriver-manager")
+            except Exception as e2:
+                logger.warning(f"Webdriver-manager failed: {e2}")
+                
+                # Method 3: Try manual driver paths
                 try:
-                    from webdriver_manager.chrome import ChromeDriverManager
-                    from webdriver_manager.core.utils import ChromeType
+                    possible_driver_paths = [
+                        "/usr/bin/chromedriver",
+                        "/usr/local/bin/chromedriver"
+                    ]
                     
-                    driver_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-                    service = Service(driver_path)
-                    driver = webdriver.Chrome(service=service, options=chrome_options)
-                    logger.info("Successfully initialized with webdriver-manager")
+                    driver_found = False
+                    for driver_path in possible_driver_paths:
+                        if os.path.exists(driver_path):
+                            service = Service(driver_path)
+                            driver = webdriver.Chrome(service=service, options=chrome_options)
+                            driver_found = True
+                            logger.info(f"Successfully initialized with driver at: {driver_path}")
+                            break
+                    
+                    if not driver_found:
+                        raise Exception("No working ChromeDriver found")
+                        
                 except Exception as e3:
                     logger.error(f"All methods failed: {e3}")
                     raise Exception(f"Unable to initialize WebDriver: {e3}")
@@ -167,6 +182,7 @@ def initialize_driver():
     except Exception as e:
         logger.error(f"Failed to initialize WebDriver: {e}")
         raise
+
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
