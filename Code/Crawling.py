@@ -46,7 +46,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# des ="sdadasd"
 
 def initialize_driver():
     """Initialize and return a Selenium WebDriver"""

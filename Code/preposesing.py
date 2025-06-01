@@ -59,17 +59,15 @@ nltk.download('stopwords', quiet=True)
 # Function to extract sentiments based on ratings
 def categorize_sentiment(rating):
     if not rating:
-        return "Unknown"
+        return "Negative"
     try:
         rating_value = float(rating)
-        if rating_value >= 8:
+        if rating_value >= 5:
             return "Positive"
-        elif rating_value >= 5:
-            return "Neutral"
         else:
             return "Negative"
     except:
-        return "Neutral"
+        return "Negative"
 
 # Function to analyze common phrases
 def extract_common_phrases(reviews, min_phrase_length=3, max_phrase_length=5):
@@ -86,35 +84,6 @@ def extract_common_phrases(reviews, min_phrase_length=3, max_phrase_length=5):
     # Count frequencies and get top phrases
     phrase_counter = Counter(phrases)
     return phrase_counter.most_common(15)
-
-# def generate_wordcloud(text_series, title= None):
-#     """Generate a word cloud from a series of texts"""
-#     # Convert entire series to strings first
-#     # text_series = text_series.astype(str)
-    
-#     # Combine all text
-#     text = ' '.join(text_series)
-    
-#     # Clean the text
-#     text = clean_text(text)
-    
-#     # Get stopwords
-#     stop_words = set(stopwords.words('english'))
-    
-#     # Create and generate word cloud
-#     wordcloud = WordCloud(width=800, height=400, 
-#                          background_color='white',
-#                          stopwords=stop_words,
-#                          max_words=100).generate(text)
-    
-#     # Create plot
-#     fig, ax = plt.subplots(figsize=(10, 5))
-#     ax.imshow(wordcloud, interpolation='bilinear')
-#     ax.axis("off")
-#     ax.set_title(title)
-#     plt.tight_layout(pad=0)
-    
-#     return fig
 
 def clean_text(text):
     """Clean text by removing HTML tags, special characters, and converting to lowercase"""
@@ -168,11 +137,12 @@ def extract_top_tfidf_terms(text_series, top_n=10):
     
     return top_terms
 
-def generate_ai_summary_for_category(analysis_data, category):
+def generate_ai_summary_for_category(api_key, analysis_data, category):
     """Generate an AI summary using OpenAI API based on the analysis data for a specific category"""
     try:
         # Set up OpenAI API client
-        openai.api_key = os.getenv("OPENAI_API_KEY")
+        # openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_key = api_key
         
         # Create different prompts based on the category
         if category == "positive":
