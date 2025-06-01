@@ -36,30 +36,27 @@ import logging
 import base64
 from datetime import datetime
 
-import os
-import random
 import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+import random
+import os
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @st.cache_resource
 def initialize_driver():
-    """Initialize WebDriver optimized for Streamlit Cloud"""
-    
+    """Initialize WebDriver optimized for Streamlit Cloud using webdriver-manager"""
     chrome_options = Options()
-    
-    # Essential options for Streamlit Cloud
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--disable-features=VizDisplayCompositor")
     chrome_options.add_argument("--window-size=1920,1080")
     chrome_options.add_argument("--single-process")
     chrome_options.add_argument("--disable-extensions")
@@ -67,88 +64,23 @@ def initialize_driver():
     chrome_options.add_argument("--disable-images")
     chrome_options.add_argument("--disable-javascript")  # Remove if you need JS
     chrome_options.add_argument("--remote-debugging-port=9222")
-    
-    # Memory optimization for limited resources
-    chrome_options.add_argument("--memory-pressure-off")
-    chrome_options.add_argument("--max_old_space_size=4096")
-    
-    # User agent randomization
+
     user_agents = [
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
     ]
-    
     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
-    
-    # Anti-detection options
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
-    
-    # Try different binary locations for Chrome
-    possible_chrome_paths = [
-        "/usr/bin/google-chrome",
-        "/usr/bin/google-chrome-stable", 
-        "/usr/bin/chromium-browser",
-        "/usr/bin/chromium"
-    ]
-    
-    chrome_binary_found = False
-    for chrome_path in possible_chrome_paths:
-        if os.path.exists(chrome_path):
-            chrome_options.binary_location = chrome_path
-            chrome_binary_found = True
-            logger.info(f"Found Chrome binary at: {chrome_path}")
-            break
-    
-    if not chrome_binary_found:
-        logger.warning("No Chrome binary found, trying without explicit path")
-    
+
     try:
-        logger.info("Attempting to initialize Chrome WebDriver...")
-        
-        # Method 1: Try with selenium-manager (Selenium 4.6+)
-        try:
-            driver = webdriver.Chrome(options=chrome_options)
-            logger.info("Successfully initialized with selenium-manager")
-        except Exception as e1:
-            logger.warning(f"Selenium-manager failed: {e1}")
-            
-            # Method 2: Try with webdriver-manager (fixed import)
-            try:
-                from webdriver_manager.chrome import ChromeDriverManager
-                
-                # Don't use ChromeType as it's not available in this version
-                driver_path = ChromeDriverManager().install()
-                service = Service(driver_path)
-                driver = webdriver.Chrome(service=service, options=chrome_options)
-                logger.info("Successfully initialized with webdriver-manager")
-            except Exception as e2:
-                logger.warning(f"Webdriver-manager failed: {e2}")
-                
-                # Method 3: Try manual driver paths
-                try:
-                    possible_driver_paths = [
-                        "/usr/bin/chromedriver",
-                        "/usr/local/bin/chromedriver"
-                    ]
-                    
-                    driver_found = False
-                    for driver_path in possible_driver_paths:
-                        if os.path.exists(driver_path):
-                            service = Service(driver_path)
-                            driver = webdriver.Chrome(service=service, options=chrome_options)
-                            driver_found = True
-                            logger.info(f"Successfully initialized with driver at: {driver_path}")
-                            break
-                    
-                    if not driver_found:
-                        raise Exception("No working ChromeDriver found")
-                        
-                except Exception as e3:
-                    logger.error(f"All methods failed: {e3}")
-                    raise Exception(f"Unable to initialize WebDriver: {e3}")
-        
+        logger.info("Initializing Chrome WebDriver with webdriver-manager...")
+        driver_path = ChromeDriverManager().install()
+        service = Service(driver_path)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        logger.info("WebDriver initialized successfully!")
+
         # Execute anti-detection script
         try:
             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
@@ -156,15 +88,15 @@ def initialize_driver():
                     Object.defineProperty(navigator, 'webdriver', {
                         get: () => undefined
                     });
-                    
+
                     Object.defineProperty(navigator, 'plugins', {
                         get: () => [1, 2, 3, 4, 5]
                     });
-                    
+
                     Object.defineProperty(navigator, 'languages', {
                         get: () => ['en-US', 'en']
                     });
-                    
+
                     const originalQuery = window.navigator.permissions.query;
                     window.navigator.permissions.query = (parameters) => (
                         parameters.name === 'notifications' ?
@@ -175,10 +107,8 @@ def initialize_driver():
             })
         except Exception as e:
             logger.warning(f"Could not execute anti-detection script: {e}")
-        
-        logger.info("WebDriver initialized successfully!")
+
         return driver
-        
     except Exception as e:
         logger.error(f"Failed to initialize WebDriver: {e}")
         raise
