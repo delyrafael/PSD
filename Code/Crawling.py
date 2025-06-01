@@ -51,30 +51,46 @@ import random
 import time
 from typing import Optional
 
-import logging
+import os
 import random
-import time
-from typing import Optional
+import streamlit as st
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+import logging
 
-# Solution 1: Use selenium-manager (Selenium 4.6+)
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@st.cache_resource
 def initialize_driver():
-    """Initialize WebDriver for Streamlit Cloud using selenium-manager"""
+    """Initialize WebDriver optimized for Streamlit Cloud"""
+    
     chrome_options = Options()
+    
+    # Essential options for Streamlit Cloud
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-features=VizDisplayCompositor")
     chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--single-process")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-plugins")
     chrome_options.add_argument("--disable-images")
-    chrome_options.add_argument("--disable-javascript")  # Optional: if you don't need JS
+    chrome_options.add_argument("--disable-javascript")  # Remove if you need JS
+    chrome_options.add_argument("--remote-debugging-port=9222")
     
-    # Randomize user agent
+    # Memory optimization for limited resources
+    chrome_options.add_argument("--memory-pressure-off")
+    chrome_options.add_argument("--max_old_space_size=4096")
+    
+    # User agent randomization
     user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
     ]
     
     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
@@ -84,129 +100,73 @@ def initialize_driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
     
+    # Set binary location for Streamlit Cloud
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
+    
     try:
-        # Let selenium-manager handle driver installation automatically
-        driver = webdriver.Chrome(options=chrome_options)
+        logger.info("Attempting to initialize Chrome WebDriver...")
         
-        # Execute CDP command to bypass bot detection
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": """
-                Object.defineProperty(navigator, 'webdriver', {
-                    get: () => undefined
-                });
-                
-                const originalQuery = window.navigator.permissions.query;
-                window.navigator.permissions.query = (parameters) => (
-                    parameters.name === 'notifications' ?
-                        Promise.resolve({state: Notification.permission}) :
-                        originalQuery(parameters)
-                );
-            """
-        })
-        return driver
-    except Exception as e:
-        print(f"Failed to initialize Chrome driver: {e}")
-        raise
-
-# Solution 2: Alternative with explicit path handling
-import os
-import platform
-
-def initialize_driver_with_path():
-    """Initialize WebDriver with explicit path handling for different environments"""
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--single-process")  # Important for limited memory environments
-    
-    # Randomize user agent
-    user_agents = [
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-    ]
-    
-    chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option("useAutomationExtension", False)
-    
-    try:
-        # Try different approaches based on environment
-        if os.getenv('STREAMLIT_SHARING'):  # Streamlit Cloud environment
-            # Method 1: Use system chrome
-            chrome_options.binary_location = "/usr/bin/google-chrome"
-            driver = webdriver.Chrome(options=chrome_options)
-        else:
-            # Method 2: Local development
+        # Method 1: Try with chromium-chromedriver from packages.txt
+        try:
+            service = Service("/usr/bin/chromedriver")
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            logger.info("Successfully initialized with system chromedriver")
+        except Exception as e1:
+            logger.warning(f"System chromedriver failed: {e1}")
+            
+            # Method 2: Try without explicit service (let Selenium manage)
             try:
                 driver = webdriver.Chrome(options=chrome_options)
-            except:
-                # Fallback to webdriver-manager
-                driver = webdriver.Chrome(
-                    service=Service(ChromeDriverManager().install()), 
-                    options=chrome_options
-                )
+                logger.info("Successfully initialized with auto-managed driver")
+            except Exception as e2:
+                logger.warning(f"Auto-managed driver failed: {e2}")
+                
+                # Method 3: Fallback to webdriver-manager
+                try:
+                    from webdriver_manager.chrome import ChromeDriverManager
+                    from webdriver_manager.core.utils import ChromeType
+                    
+                    driver_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+                    service = Service(driver_path)
+                    driver = webdriver.Chrome(service=service, options=chrome_options)
+                    logger.info("Successfully initialized with webdriver-manager")
+                except Exception as e3:
+                    logger.error(f"All methods failed: {e3}")
+                    raise Exception(f"Unable to initialize WebDriver: {e3}")
         
-        # Anti-detection script
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": """
-                Object.defineProperty(navigator, 'webdriver', {
-                    get: () => undefined
-                });
-            """
-        })
-        return driver
-    except Exception as e:
-        print(f"Failed to initialize driver: {e}")
-        raise
-
-# Solution 3: Using ChromeDriverManager with explicit installation
-def initialize_driver_fallback():
-    """Fallback method with explicit ChromeDriver management"""
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--remote-debugging-port=9222")
-    
-    user_agents = [
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
-    ]
-    
-    chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option("useAutomationExtension", False)
-    
-    try:
-        # Install ChromeDriver with specific version handling
-        from webdriver_manager.chrome import ChromeDriverManager
-        from webdriver_manager.core.utils import ChromeType
-        
-        # Try to install ChromeDriver
-        driver_path = ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-        service = Service(driver_path)
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
-        })
-        return driver
-    except Exception as e:
-        print(f"ChromeDriverManager failed: {e}")
-        # Try without service
+        # Execute anti-detection script
         try:
-            driver = webdriver.Chrome(options=chrome_options)
-            return driver
-        except Exception as e2:
-            print(f"All methods failed: {e2}")
-            raise
+            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": """
+                    Object.defineProperty(navigator, 'webdriver', {
+                        get: () => undefined
+                    });
+                    
+                    Object.defineProperty(navigator, 'plugins', {
+                        get: () => [1, 2, 3, 4, 5]
+                    });
+                    
+                    Object.defineProperty(navigator, 'languages', {
+                        get: () => ['en-US', 'en']
+                    });
+                    
+                    const originalQuery = window.navigator.permissions.query;
+                    window.navigator.permissions.query = (parameters) => (
+                        parameters.name === 'notifications' ?
+                            Promise.resolve({state: Notification.permission}) :
+                            originalQuery(parameters)
+                    );
+                """
+            })
+        except Exception as e:
+            logger.warning(f"Could not execute anti-detection script: {e}")
+        
+        logger.info("WebDriver initialized successfully!")
+        return driver
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize WebDriver: {e}")
+        raise
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
