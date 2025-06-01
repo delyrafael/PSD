@@ -5,6 +5,7 @@ FROM python:3.11-slim-buster
 RUN apt-get update && \
     apt-get install -y \
     chromium-browser \
+    chromium-chromedriver \ # Install ChromeDriver from apt
     libnss3 \
     libgconf-2-4 \
     libatk1.0-0 \
@@ -16,13 +17,17 @@ RUN apt-get update && \
     libfontconfig1 \
     && rm -rf /var/lib/apt/lists/*
 
+# Verify Chrome and ChromeDriver versions
+RUN chromium-browser --version
+RUN chromedriver --version
+
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the requirements.txt and packages.txt files
-COPY requirements.txt packages.txt ./
+# Copy the requirements.txt file
+COPY requirements.txt ./
 
-# Install Python dependencies
+# Install Python dependencies (reduced for testing)
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the entire Streamlit app
