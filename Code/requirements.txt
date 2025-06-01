@@ -1,5 +1,5 @@
 selenium==4.15.2
-webdriver-manager>=5.0.0  # Upgrade webdriver-manager
+webdriver-manager==4.3.0  # Try this version
 streamlit>=1.45.0
 beautifulsoup4
 requests
