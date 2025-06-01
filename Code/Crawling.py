@@ -56,60 +56,52 @@ import random
 import time
 from typing import Optional
 
-def initialize_driver(max_retries: int = 3, wait_time: int = 5) -> Optional[webdriver.Chrome]:
-    """
-    Initialize and return a Selenium WebDriver for Streamlit Cloud.
-    This function explicitly sets up Chrome options and driver path.
-    """
-
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.chrome.service import Service
-
+def initialize_driver():Add commentMore actions
+    """Initialize and return a Selenium WebDriver"""
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.binary_location = "/usr/bin/chromium-browser"
+    
+    # Randomize user agent to avoid detection
     user_agents = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36",
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0",
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
     ]
+    
     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
+    
+    # Additional options to avoid detection
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
-
-    for attempt in range(max_retries):
-        try:
-            service = Service("/usr/bin/chromedriver")  # Explicit path to chromedriver
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                "source": """
-                    Object.defineProperty(navigator, 'webdriver', {
-                        get: () => undefined
-                    });
-                    const originalQuery = window.navigator.permissions.query;
-                    window.navigator.permissions.query = (parameters) => (
-                        parameters.name === 'notifications' ?
-                            Promise.resolve({state: Notification.permission}) :
-                            originalQuery(parameters)
-                    );
-                """
-            })
-            logging.info("Selenium WebDriver initialized successfully.")
-            return driver
-        except Exception as e:
-            logging.error(f"Attempt {attempt + 1} failed to initialize driver: {e}")
-            if attempt < max_retries - 1:
-                time.sleep(wait_time)
-            else:
-                raise
-    return None
+    
+    try:
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        # Execute CDP command to bypass bot detection
+        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+            "source": """
+                Object.defineProperty(navigator, 'webdriver', {
+                    get: () => undefined
+                });
+                
+                // Additional stealth setup
+                const originalQuery = window.navigator.permissions.query;Add commentMore actions
+                window.navigator.permissions.query = (parameters) => (
+                    parameters.name === 'notifications' ?
+                        Promise.resolve({state: Notification.permission}) :
+                        originalQuery(parameters)
+                );
+            """
+        })
+        return driver
+    except Exception as e:
+        logger.error(f"Failed to initialize driver: {e}")
+        raise
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
