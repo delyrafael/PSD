@@ -124,7 +124,7 @@ if 'loading' not in st.session_state:
 
 page = st.sidebar.selectbox("Navigate", ["API Assign","Home", "Crawling Dashboard", "Analisis Movie"])
 logging.getLogger("streamlit.runtime.caching.cache_data_api.CacheDataAPI object at").setLevel(logging.ERROR)
-st.cache_data.clear().
+st.cache_data.clear()
 GLOBAL_API_KEY = None
 if page == "API Assign":
     st.title("Masukan API Key OpenAI")
