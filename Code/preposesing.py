@@ -9,7 +9,6 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import openai
-from openai import OpenAI
 import os
 from dotenv import load_dotenv
 # Function to clean text for analysis
@@ -51,9 +50,8 @@ def generate_wordcloud(text,title= None):
 
 
 # Load environment variables
-
 load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
 # Download necessary NLTK resources
 nltk.download('punkt', quiet=True)
 nltk.download('stopwords', quiet=True)
@@ -61,17 +59,15 @@ nltk.download('stopwords', quiet=True)
 # Function to extract sentiments based on ratings
 def categorize_sentiment(rating):
     if not rating:
-        return "Unknown"
+        return "Negative"
     try:
         rating_value = float(rating)
-        if rating_value >= 8:
+        if rating_value >= 5:
             return "Positive"
-        elif rating_value >= 5:
-            return "Neutral"
         else:
             return "Negative"
     except:
-        return "Neutral"
+        return "Negative"
 
 # Function to analyze common phrases
 def extract_common_phrases(reviews, min_phrase_length=3, max_phrase_length=5):
@@ -89,35 +85,6 @@ def extract_common_phrases(reviews, min_phrase_length=3, max_phrase_length=5):
     phrase_counter = Counter(phrases)
     return phrase_counter.most_common(15)
 
-# def generate_wordcloud(text_series, title= None):
-#     """Generate a word cloud from a series of texts"""
-#     # Convert entire series to strings first
-#     # text_series = text_series.astype(str)
-    
-#     # Combine all text
-#     text = ' '.join(text_series)
-    
-#     # Clean the text
-#     text = clean_text(text)
-    
-#     # Get stopwords
-#     stop_words = set(stopwords.words('english'))
-    
-#     # Create and generate word cloud
-#     wordcloud = WordCloud(width=800, height=400, 
-#                          background_color='white',
-#                          stopwords=stop_words,
-#                          max_words=100).generate(text)
-    
-#     # Create plot
-#     fig, ax = plt.subplots(figsize=(10, 5))
-#     ax.imshow(wordcloud, interpolation='bilinear')
-#     ax.axis("off")
-#     ax.set_title(title)
-#     plt.tight_layout(pad=0)
-    
-#     return fig
-
 def clean_text(text):
     """Clean text by removing HTML tags, special characters, and converting to lowercase"""
     # Ensure input is always treated as string
@@ -132,37 +99,6 @@ def clean_text(text):
     # Remove extra spaces
     text = re.sub(r'\s+', ' ', text).strip()
     return text
-
-def analyze_sentiment(text):
-    prompt = f"""
-    Your role: As a sentiment analysis assistant that helps labeling message.
-    Task: Answer with only one of the sentiment labels in the list (["negative", "positive"]) for the given message.
-    STRICT RESTRICTION: You must answer only with either "positive" or "negative". 
-    If uncertain, choose the most likely label based on the overall tone.
-    Message: {text}
-    """
-    
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": "You are a strict sentiment classifier that only outputs 'positive' or 'negative'."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.0
-    )
-    
-    # Extract and strictly validate the sentiment
-    sentiment = response.choices[0].message.content.strip().lower()
-    
-    # Force binary classification
-    if "positive" in sentiment:
-        return "positive"
-    elif "negative" in sentiment:
-        return "negative"
-    
-    # Final fallback to positive for any ambiguous cases
-    return "positive"
-
 
 def get_most_common_words(text_series, top_n=10):
     """Extract most common words from a series of texts"""
@@ -201,11 +137,12 @@ def extract_top_tfidf_terms(text_series, top_n=10):
     
     return top_terms
 
-def generate_ai_summary_for_category(analysis_data, category):
+def generate_ai_summary_for_category(api_key, analysis_data, category):
     """Generate an AI summary using OpenAI API based on the analysis data for a specific category"""
     try:
         # Set up OpenAI API client
-        openai.api_key = os.getenv("OPENAI_API_KEY")
+        # openai.api_key = os.getenv("OPENAI_API_KEY")
+        openai.api_key = api_key
         
         # Create different prompts based on the category
         if category == "positive":
@@ -468,4 +405,3 @@ def generate_rag_summary(csv_file):
     print("- sentiment_distribution.png")
     print("- word_frequency_comparison.png")
     print("- sentiment_analysis_summary.txt (includes all AI summaries)")
-
