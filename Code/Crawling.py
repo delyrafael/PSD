@@ -139,13 +139,9 @@ def initialize_driver():
                 except Exception as e2:
                     logger.warning(f"Webdriver-manager failed: {e2}")
                     raise Exception(f"Unable to initialize WebDriver with selenium-manager or webdriver-manager: {e1}, {e2}")
-        except Exception as e:
-            logger.error(f"Failed to initialize WebDriver: {e}")
-            raise
-
-
-
-
+    except Exception as e:
+        logger.error(f"Failed to initialize WebDriver: {e}")
+        raise
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
