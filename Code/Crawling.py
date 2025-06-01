@@ -135,7 +135,9 @@ def initialize_driver():
                             );
                         """
                     })
-                    return driver
+                except Exception as e:
+                    logger.warning(f"Could not execute anti-detection script: {e}")
+                return driver
             except Exception as e2:
                 logger.warning(f"Webdriver-manager failed: {e2}")
                 raise Exception(f"Unable to initialize WebDriver with selenium-manager or webdriver-manager: {e1}, {e2}")
