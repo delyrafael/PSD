@@ -49,14 +49,23 @@ logger = logging.getLogger(__name__)
 # des ="sdadasd"
 
 def initialize_driver():
-    """Initialize and return a Selenium WebDriver"""
+    """
+    Initialize and return a Selenium WebDriver configured for Streamlit Cloud.
+    This function includes options for headless mode, sandbox disabling,
+    and anti-detection measures.
+    """
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox") # Required for running in containerized environments
+    chrome_options.add_argument("--disable-dev-shm-usage") # Overcomes limited /dev/shm space in some environments
+    chrome_options.add_argument("--disable-gpu") # Recommended for headless environments
     chrome_options.add_argument("--window-size=1920,1080")
-    
+
+    # IMPORTANT: Explicitly set the binary location for Chromium on Streamlit Cloud
+    # This path is standard for chromium-browser installed via apt on Ubuntu.
+    chrome_options.binary_location = "/usr/bin/chromium-browser"
+    logger.info(f"Chromium binary location set to: {chrome_options.binary_location}")
+
     # Randomize user agent to avoid detection
     user_agents = [
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
@@ -64,24 +73,34 @@ def initialize_driver():
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0",
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
     ]
-    
     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
-    
+
     # Additional options to avoid detection
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
-    
+
     try:
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        # Use ChromeDriverManager to get the path to the ChromeDriver executable.
+        # This will download the correct version and return its path.
+        driver_path = ChromeDriverManager().install()
+        logger.info(f"ChromeDriver installed by webdriver_manager at: {driver_path}")
+
+        # Initialize the service with the downloaded driver path
+        service = Service(driver_path)
+
+        # Create the WebDriver instance
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        logger.info("Selenium WebDriver instance created.")
+
         # Execute CDP command to bypass bot detection
         driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
             "source": """
                 Object.defineProperty(navigator, 'webdriver', {
                     get: () => undefined
                 });
-                
-                // Additional stealth setup
+
+                // Additional stealth setup for permissions API
                 const originalQuery = window.navigator.permissions.query;
                 window.navigator.permissions.query = (parameters) => (
                     parameters.name === 'notifications' ?
@@ -90,9 +109,11 @@ def initialize_driver():
                 );
             """
         })
+        logger.info("CDP commands executed for stealth.")
         return driver
     except Exception as e:
         logger.error(f"Failed to initialize driver: {e}")
+        # Re-raise the exception so Streamlit Cloud logs it clearly and stops the app
         raise
 
 def random_delay(min_seconds=2, max_seconds=5):
