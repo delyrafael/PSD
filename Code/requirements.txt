@@ -11,6 +11,7 @@ python-dotenv>=1.0.0
 beautifulsoup4>=4.10.0
 selenium>=4.0.0
 requests>=2.26.0
+pyppeteer
 libnss3
 libgconf-2-4
 libatk1.0-0
