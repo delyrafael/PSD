@@ -108,12 +108,12 @@ def initialize_driver():
             logger.warning(f"Selenium-manager failed: {e1}")
             # Method 2: Try with webdriver-manager (explicit version)
             try:
-                logger.info("Initializing Chrome WebDriver with webdriver-manager (explicit version)...")
-                chromedriver_version = "114.0.5735.90"  # Try a specific version
-                driver_path = ChromeDriverManager(version=chromedriver_version).install()
+                logger.info("Initializing Chrome WebDriver with webdriver-manager (auto version)...")
+                driver_path = ChromeDriverManager().install()
                 service = Service(driver_path)
                 driver = webdriver.Chrome(service=service, options=chrome_options)
-                logger.info(f"Successfully initialized with webdriver-manager (version {chromedriver_version})")
+                logger.info(f"Successfully initialized with webdriver-manager (auto version)")
+
                 # ... anti-detection script ...
                 try:
                     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
@@ -135,15 +135,14 @@ def initialize_driver():
                             );
                         """
                     })
-                except Exception as e:
-                    logger.warning(f"Could not execute anti-detection script: {e}")
-                return driver
-            except Exception as e2:
+                    return driver
+                except Exception as e2:
                 logger.warning(f"Webdriver-manager failed: {e2}")
                 raise Exception(f"Unable to initialize WebDriver with selenium-manager or webdriver-manager: {e1}, {e2}")
     except Exception as e:
         logger.error(f"Failed to initialize WebDriver: {e}")
         raise
+
 
 
 
