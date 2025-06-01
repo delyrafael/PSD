@@ -12,3 +12,11 @@ beautifulsoup4>=4.10.0
 selenium>=4.0.0
 webdriver-manager>=3.8
 requests>=2.26.0
+libnss3
+libgconf-2-4
+libatk1.0-0
+libgtk-3-0
+libasound2
+libxshm4
+libxrandr2
+libcups2
