@@ -1,0 +1,8 @@
+libnss3
+libgconf-2-4
+libatk1.0-0
+libgtk-3-0
+libasound2
+libxshm4
+libxrandr2
+libcups2
