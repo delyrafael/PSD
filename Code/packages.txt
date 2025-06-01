@@ -6,3 +6,4 @@ libasound2
 libxshm4
 libxrandr2
 libcups2
+libfontconfig1
