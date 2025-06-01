@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 import logging
 import random
-import time  # Import the time module
+import time
 from typing import Optional
 
 def initialize_driver(max_retries: int = 3, wait_time: int = 5) -> Optional[webdriver.Chrome]:
@@ -57,6 +57,13 @@ def initialize_driver(max_retries: int = 3, wait_time: int = 5) -> Optional[webd
     This function includes options for headless mode, sandbox disabling,
     anti-detection measures, and retries.
     """
+
+    # Import Selenium modules here, outside the try block but inside the function
+    from selenium import webdriver
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
+    from webdriver_manager.chrome import ChromeDriverManager
+
     chrome_options = Options()
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
@@ -77,10 +84,6 @@ def initialize_driver(max_retries: int = 3, wait_time: int = 5) -> Optional[webd
 
     for attempt in range(max_retries):
         try:
-            from selenium import webdriver  # Local import
-            from selenium.webdriver.chrome.options import Options
-            from selenium.webdriver.chrome.service import Service
-            from webdriver_manager.chrome import ChromeDriverManager
             driver_path = ChromeDriverManager().install()
             service = Service(driver_path)
             driver = webdriver.Chrome(service=service, options=chrome_options)
@@ -102,10 +105,10 @@ def initialize_driver(max_retries: int = 3, wait_time: int = 5) -> Optional[webd
         except Exception as e:
             logging.error(f"Attempt {attempt + 1} failed to initialize driver: {e}")
             if attempt < max_retries - 1:
-                time.sleep(wait_time)  # Wait before retrying
+                time.sleep(wait_time)
             else:
-                raise  # If retries fail, raise the exception
-    return None  # Return None if all retries fail (optional, but good practice)
+                raise
+    return None
 
 
 def random_delay(min_seconds=2, max_seconds=5):
