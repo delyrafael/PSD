@@ -134,30 +134,16 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def initialize_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    # chrome_options.add_argument("--disable-gpu")
-    # chrome_options.add_argument("--window-size=1920x1080")
+    chrome_options.add_argument("--no-sandbox") # Sangat penting untuk Linux container
+    chrome_options.add_argument("--disable-dev-shm-usage") # Penting untuk memory di container
 
-    # Penting: Tentukan path ke binary Chromium yang terinstal di Streamlit Cloud
-    # Browser yang terinstal adalah Chromium (versi 120.x) di /usr/bin/chromium
-    service = ChromeService(ChromeDriverManager(
-        chrome_type="chromium", # Tentukan tipe browser
-        version=None, # Biarkan webdriver-manager mendeteksi versi dari binary
-        path="/home/appuser/.wdm/drivers/chromedriver/" # Opsional: jika ingin mengontrol lokasi cache
-    ).install())
+    # Set lokasi binary Chromium yang terinstal di Streamlit Cloud
+    # Log error sebelumnya menunjukkan binary path adalah /usr/bin/chromium
+    chrome_options.binary_location = "/usr/bin/chromium"
 
-    # Atau cara yang lebih sederhana dan sering berhasil:
-    # Biarkan webdriver-manager mencoba menebak versi dari opsi browser
-    # service = ChromeService(ChromeDriverManager().install())
-    # chrome_options.binary_location = "/usr/bin/chromium" # Set lokasi binary Chromium
-
-    # Alternatif yang lebih eksplisit jika cara di atas tidak berhasil:
-    # Anda juga bisa mencoba secara langsung mendefinisikan versi chromedriver
-    # jika Anda yakin dengan versi Chromium yang diinstal (misal 120.0.6099.224)
-    # service = ChromeService(ChromeDriverManager(version="120.0.6099.109").install())
-    # chrome_options.binary_location = "/usr/bin/chromium"
-
+    # Biarkan ChromeDriverManager mengunduh driver yang kompatibel secara otomatis
+    # Tanpa argumen 'version' yang tidak didukung
+    service = ChromeService(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
     
