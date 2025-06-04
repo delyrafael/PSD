@@ -321,7 +321,8 @@ elif page == "Analisis Movie":
                 'rating': final_rating,
                 'reviewer': review.get('reviewer_name', 'Anonymous'),
                 'date': review.get('review_date', 'Unknown date'),
-                'sentiment': categorize_sentiment(review.get('rating_value'))
+                # 'sentiment': categorize_sentiment(review.get('rating_value'))
+                'sentiment': analyze_sentiment(review.get('full_review', ''))
             })
         
         df_reviews = pd.DataFrame(review_data)
