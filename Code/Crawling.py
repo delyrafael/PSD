@@ -19,9 +19,6 @@ import contextlib
 # The functions we need from the original script
 import requests
 from bs4 import BeautifulSoup
-import json
-import os
-import re
 import time
 import random
 from selenium import webdriver
@@ -48,7 +45,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType # This is the crucial import
 
 import random
-import logging
 import os
 import shutil # Import shutil for get_chromedriver_path
 
@@ -140,7 +136,6 @@ logger.setLevel(logging.INFO)
 # Hanya konfigurasi logging dasar jika belum ada di tempat lain
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') # Komentar atau hapus jika sudah ada di Dashboard.py
 
-@st.cache_resource
 def initialize_driver():
     return webdriver.Chrome(
         service=Service(
