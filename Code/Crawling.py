@@ -139,13 +139,19 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 #             driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
 #         raise
 
-def initialize_driver():
+def initialize_driver(options): # Menerima 'options' sebagai parameter
     return webdriver.Chrome(
-        service=Service(
+        service=ChromeService(
+            # Penting: Set binary_location di options sebelum ChromeDriverManager().install()
+            # Ini membantu webdriver-manager menemukan versi yang tepat untuk Chromium
+            # Di Streamlit Cloud, Chromium terinstal di /usr/bin/chromium
+            # Jika Anda menggunakan ChromeType.CHROMIUM, biasanya tidak perlu set binary_location secara eksplisit
+            # karena webdriver-manager akan mengasumsikan Chromium
             ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
         ),
-        options=options,
+        options=options, # Gunakan 'options' yang diterima sebagai parameter
     )
+
     
 
 def random_delay(min_seconds=2, max_seconds=5):
@@ -818,11 +824,19 @@ def scrape_all_reviews(imdb_id, driver, max_pages=None):
 def get_movie_reviews_by_title(movie_title, max_pages=None):
     """Main function to get reviews by movie title using Selenium"""
     logger.info(f"\nSearching for movie: {movie_title}")
-    options = Options()
-    options.add_argument("--disable-gpu")
-    options.add_argument("--headless")
 
-    driver = initialize_driver()
+    options = Options() # 'options' didefinisikan di sini
+    options.add_argument("--headless") # Jalankan dalam mode headless
+    options.add_argument("--no-sandbox") # Sangat penting untuk lingkungan Linux container
+    options.add_argument("--disable-dev-shm-usage") # Penting untuk memory di container
+    options.add_argument("--disable-gpu") # Bisa membantu jika ada masalah GPU
+    # options.add_argument("--window-size=1920x1080") # Opsional, ukuran jendela virtual
+
+    # Set lokasi binary Chromium untuk Selenium
+    # Ini memberi tahu Selenium di mana menemukan browser Chromium yang diinstal oleh packages.txt
+    options.binary_location = "/usr/bin/chromium"
+
+    driver = initialize_driver(options)
     
     try:
         # Search for the movie
