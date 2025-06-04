@@ -31,7 +31,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
-from webdriver_manager.core.utils import ChromeType # Penting untuk ChromeType.CHROMIUM
+from webdriver_manager.core.os_manager import ChromeType
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
