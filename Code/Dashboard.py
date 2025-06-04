@@ -307,6 +307,13 @@ elif page == "Analisis Movie":
         # Create dataframe from reviews
         review_data = []
         for review in reviews:
+            rating_val = review.get('rating_value', 'Unknown')
+            
+            # Jika rating_val adalah 'Unknown', set menjadi 0
+            if rating_val == 'Unknown':
+                final_rating = 0
+            else:
+                final_rating = rating_val
             review_data.append({
                 'short_review': review.get('short_review', 'No title'),
                 'full_review': review.get('full_review', 'No content'),
