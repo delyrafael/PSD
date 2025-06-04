@@ -130,12 +130,17 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 #             driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
 #         raise
 
-def initialize_driver():
-    options = Options() 
-    options.add_argument("--headless=new")
-    options.add_argument('--disable-gpu')
-    
-    driver = webdriver.Chrome(options=options)
+def get_chrome_driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Jalankan dalam mode headless
+    chrome_options.add_argument("--no-sandbox") # Penting untuk lingkungan Linux
+    chrome_options.add_argument("--disable-dev-shm-usage") # Mengatasi masalah memory
+    # chrome_options.add_argument("--disable-gpu") # Bisa membantu jika ada masalah GPU
+    # chrome_options.add_argument("--window-size=1920x1080") # Ukuran jendela virtual
+
+    # Gunakan ChromeDriverManager untuk mengelola chromedriver
+    service = ChromeService(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
     
 
