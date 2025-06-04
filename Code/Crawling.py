@@ -47,20 +47,14 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType # This is the crucial import
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType
-
 import random
 import logging
 import os
 import shutil # Import shutil for get_chromedriver_path
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.INFO)
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 @st.cache_resource
 # def initialize_driver():
@@ -139,17 +133,22 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 #             driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
 #         raise
 
-def initialize_driver(options): # Menerima 'options' sebagai parameter
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.core.utils import ChromeType # Penting untuk ChromeType.CHROMIUM
+
+import logging
+logger = logging.getLogger(__name__) # Asumsi logger sudah didefinisikan
+
+def initialize_driver(options): # <<< Fungsi ini menerima 'options' sebagai argumen
+    """Inisialisasi Selenium WebDriver dengan opsi yang diberikan."""
     return webdriver.Chrome(
         service=ChromeService(
-            # Penting: Set binary_location di options sebelum ChromeDriverManager().install()
-            # Ini membantu webdriver-manager menemukan versi yang tepat untuk Chromium
-            # Di Streamlit Cloud, Chromium terinstal di /usr/bin/chromium
-            # Jika Anda menggunakan ChromeType.CHROMIUM, biasanya tidak perlu set binary_location secara eksplisit
-            # karena webdriver-manager akan mengasumsikan Chromium
             ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
         ),
-        options=options, # Gunakan 'options' yang diterima sebagai parameter
+        options=options,
     )
 
     
@@ -822,20 +821,20 @@ def scrape_all_reviews(imdb_id, driver, max_pages=None):
     return result
 
 def get_movie_reviews_by_title(movie_title, max_pages=None):
-    """Main function to get reviews by movie title using Selenium"""
+    """Fungsi utama untuk mendapatkan ulasan film menggunakan Selenium."""
     logger.info(f"\nSearching for movie: {movie_title}")
 
-    options = Options() # 'options' didefinisikan di sini
-    options.add_argument("--headless") # Jalankan dalam mode headless
-    options.add_argument("--no-sandbox") # Sangat penting untuk lingkungan Linux container
-    options.add_argument("--disable-dev-shm-usage") # Penting untuk memory di container
-    options.add_argument("--disable-gpu") # Bisa membantu jika ada masalah GPU
-    # options.add_argument("--window-size=1920x1080") # Opsional, ukuran jendela virtual
+    options = Options() # <<< Objek 'options' dibuat di sini
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu") # Anda dapat menghapus ini jika tidak menyebabkan masalah
+    # options.add_argument("--window-size=1920x1080") # Opsional
 
-    # Set lokasi binary Chromium untuk Selenium
-    # Ini memberi tahu Selenium di mana menemukan browser Chromium yang diinstal oleh packages.txt
+    # Sangat penting: Memberitahu Selenium di mana binary Chromium berada
     options.binary_location = "/usr/bin/chromium"
 
+    # <<< Panggil initialize_driver dan LEWATKAN 'options' sebagai argumen
     driver = initialize_driver(options)
     
     try:
