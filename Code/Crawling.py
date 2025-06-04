@@ -133,15 +133,7 @@ import shutil # Import shutil for get_chromedriver_path
 #             driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
 #         raise
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
-from webdriver_manager.core.utils import ChromeType # Untuk ChromeType.CHROMIUM
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
