@@ -40,10 +40,14 @@ import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import random
 import logging
 import os
+import shutil # Import shutil for get_chromedriver_path
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -53,95 +57,77 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def initialize_driver():
     """Initialize WebDriver optimized for Streamlit Cloud"""
     chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--headless") # Wajib untuk lingkungan tanpa UI
+    chrome_options.add_argument("--no-sandbox") # Penting untuk lingkungan Linux/Docker
+    chrome_options.add_argument("--disable-dev-shm-usage") # Penting untuk lingkungan Linux/Docker
+    chrome_options.add_argument("--disable-gpu") # Penting untuk lingkungan headless
     chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--single-process")
+    chrome_options.add_argument("--single-process") # Dapat membantu di beberapa lingkungan cloud
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-plugins")
-    chrome_options.add_argument("--disable-images")
-    chrome_options.add_argument("--disable-javascript")  # Remove if you need JS
+    # chrome_options.add_argument("--disable-images") # Aktifkan jika Anda ingin menghemat bandwidth/memori
+    # chrome_options.add_argument("--disable-javascript") # Hapus jika Anda membutuhkan JS untuk halaman
     chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--ignore-certificate-errors") # Dapat membantu jika ada masalah SSL
 
     user_agents = [
         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36"
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
     ]
     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option("useAutomationExtension", False)
 
+    driver = None
     try:
         logger.info("Attempting to initialize Chrome WebDriver...")
-        # Method 1: Try with selenium-manager
+        # Prioritaskan chromedriver yang diinstal sistem (via packages.txt)
+        system_chromedriver_path = shutil.which('chromedriver') # Cari 'chromedriver' di PATH sistem
+        if system_chromedriver_path:
+            logger.info(f"Using system-installed chromedriver at: {system_chromedriver_path}")
+            service = Service(executable_path=system_chromedriver_path)
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            logger.info("Successfully initialized with system-installed chromedriver.")
+        else:
+            logger.warning("System-installed chromedriver not found. Falling back to webdriver-manager.")
+            # Fallback ke webdriver-manager jika chromedriver sistem tidak ditemukan
+            driver_path = ChromeDriverManager().install()
+            service = Service(driver_path)
+            driver = webdriver.Chrome(service=service, options=chrome_options)
+            logger.info(f"Successfully initialized with webdriver-manager.")
+
+        # Anti-detection scripts (tetap dipertahankan)
         try:
-            driver = webdriver.Chrome(options=chrome_options)
-            logger.info("Successfully initialized with selenium-manager")
-            # ... anti-detection script ...
-            try:
-                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                    "source": """
-                        Object.defineProperty(navigator, 'webdriver', {
-                            get: () => undefined
-                        });
-                        Object.defineProperty(navigator, 'plugins', {
-                            get: () => [1, 2, 3, 4, 5]
-                        });
-                        Object.defineProperty(navigator, 'languages', {
-                            get: () => ['en-US', 'en']
-                        });
-                        const originalQuery = window.navigator.permissions.query;
-                        window.navigator.permissions.query = (parameters) => (
-                            parameters.name === 'notifications' ?
-                                Promise.resolve({state: Notification.permission}) :
-                                originalQuery(parameters)
-                        );
-                    """
-                })
-            except Exception as e:
-                logger.warning(f"Could not execute anti-detection script: {e}")
-            return driver
-        except Exception as e1:
-            logger.warning(f"Selenium-manager failed: {e1}")
-            # Method 2: Try with webdriver-manager (manual Service instantiation)
-            try:
-                logger.info("Initializing Chrome WebDriver with webdriver-manager (manual Service)...")
-                driver_path = ChromeDriverManager().install()
-                service = Service(driver_path)
-                driver = webdriver.Chrome(service=service, options=chrome_options)
-                logger.info(f"Successfully initialized with webdriver-manager (manual Service)")
-                # ... anti-detection script ...
-                try:
-                    driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                        "source": """
-                            Object.defineProperty(navigator, 'webdriver', {
-                                get: () => undefined
-                            });
-                            Object.defineProperty(navigator, 'plugins', {
-                                get: () => [1, 2, 3, 4, 5]
-                            });
-                            Object.defineProperty(navigator, 'languages', {
-                                get: () => ['en-US', 'en']
-                            });
-                            const originalQuery = window.navigator.permissions.query;
-                            window.navigator.permissions.query = (parameters) => (
-                                parameters.name === 'notifications' ?
-                                    Promise.resolve({state: Notification.permission}) :
-                                    originalQuery(parameters)
-                            );
-                        """
-                    })
-                except Exception as e:
-                    logger.warning(f"Could not execute anti-detection script: {e}")
-                return driver
-            except Exception as e2:
-                logger.warning(f"Webdriver-manager failed: {e2}")
-                raise Exception(f"Unable to initialize WebDriver with selenium-manager or webdriver-manager: {e1}, {e2}")
+            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": """
+                    Object.defineProperty(navigator, 'webdriver', {
+                        get: () => undefined
+                    });
+                    Object.defineProperty(navigator, 'plugins', {
+                        get: () => [1, 2, 3, 4, 5] // Simulasikan plugin
+                    });
+                    Object.defineProperty(navigator, 'languages', {
+                        get: () => ['en-US', 'en'] // Simulasikan bahasa
+                    });
+                    const originalQuery = window.navigator.permissions.query;
+                    window.navigator.permissions.query = (parameters) => (
+                        parameters.name === 'notifications' ?
+                            Promise.resolve({state: Notification.permission}) :
+                            originalQuery(parameters)
+                    );
+                """
+            })
+        except Exception as e:
+            logger.warning(f"Could not execute anti-detection script: {e}")
+        return driver
     except Exception as e:
         logger.error(f"Failed to initialize WebDriver: {e}")
+        st.error(f"Gagal menginisialisasi WebDriver: {e}")
+        if driver:
+            driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
         raise
 
 def random_delay(min_seconds=2, max_seconds=5):
