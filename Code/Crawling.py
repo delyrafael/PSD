@@ -132,20 +132,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 #         raise
 
 def initialize_driver():
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--no-sandbox") # Sangat penting untuk Linux container
-    chrome_options.add_argument("--disable-dev-shm-usage") # Penting untuk memory di container
-
-    # Set lokasi binary Chromium yang terinstal di Streamlit Cloud
-    # Log error sebelumnya menunjukkan binary path adalah /usr/bin/chromium
-    chrome_options.binary_location = "/usr/bin/chromium"
-
-    # Biarkan ChromeDriverManager mengunduh driver yang kompatibel secara otomatis
-    # Tanpa argumen 'version' yang tidak didukung
-    service = ChromeService(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
+    return webdriver.Chrome(
+        service=Service(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+        ),
+        options=options,
+    )
     
 
 def random_delay(min_seconds=2, max_seconds=5):
@@ -818,7 +810,10 @@ def scrape_all_reviews(imdb_id, driver, max_pages=None):
 def get_movie_reviews_by_title(movie_title, max_pages=None):
     """Main function to get reviews by movie title using Selenium"""
     logger.info(f"\nSearching for movie: {movie_title}")
-    
+    options = Options()
+    options.add_argument("--disable-gpu")
+    options.add_argument("--headless")
+
     driver = initialize_driver()
     
     try:
