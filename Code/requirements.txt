@@ -1,8 +1,5 @@
 streamlit
 pandas
-json
-os
-time
 plotly-express
 plotly
 wordcloud
@@ -12,4 +9,4 @@ beautifulsoup4
 requests
 selenium
 webdriver-manager
-openai # If you use OpenAI API in preprocessing.py
+openai
