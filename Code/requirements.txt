@@ -12,9 +12,3 @@ numpy>=1.21.0
 scikit-learn>=1.0
 openai>=1.0.0
 python-dotenv>=1.0.0
-chromium-browser
-chromium-chromedriver
-libglib2.0-0
-libnss3
-libgconf-2-4
-libfontconfig1
