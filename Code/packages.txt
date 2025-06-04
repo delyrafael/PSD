@@ -4,3 +4,5 @@ libegl1-mesa
 libxrender1
 libxtst6
 libxext6
+chromium
+chromium-driver
