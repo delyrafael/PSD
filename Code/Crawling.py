@@ -130,7 +130,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 #             driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
 #         raise
 
-def get_chrome_driver():
+def initialize_driver():
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Jalankan dalam mode headless
     chrome_options.add_argument("--no-sandbox") # Penting untuk lingkungan Linux
