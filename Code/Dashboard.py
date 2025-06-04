@@ -13,7 +13,7 @@ from Crawling import (
     initialize_driver, search_movie_by_title, scrape_all_reviews,get_movie_reviews_by_title)
 
 from preposesing import (
-    clean_text, generate_wordcloud, categorize_sentiment,analyze_sentiment, extract_common_phrases)
+    clean_text, generate_wordcloud, categorize_sentiment, extract_common_phrases)
 
 
 # Set page configuration
