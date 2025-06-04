@@ -15,12 +15,14 @@ import importlib.util
 from io import StringIO
 import contextlib
 
-# Import the IMDb scraper functionality
-# The functions we need from the original script
+# --- Konsolidasi semua import di sini ---
 import requests
 from bs4 import BeautifulSoup
-import time
 import random
+import logging
+import shutil # Import shutil for get_chromedriver_path
+from datetime import datetime
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -29,123 +31,82 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
-import logging
-import base64
-from datetime import datetime
-
-import streamlit as st
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.core.os_manager import ChromeType # This is the crucial import
-
-import random
-import os
-import shutil # Import shutil for get_chromedriver_path
-
-# logger = logging.getLogger(__name__)
-# logger.setLevel(logging.INFO)
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-@st.cache_resource
-# def initialize_driver():
-#     """Initialize WebDriver optimized for Streamlit Cloud"""
-#     chrome_options = Options()
-#     chrome_options.add_argument("--headless") # Wajib untuk lingkungan tanpa UI
-#     chrome_options.add_argument("--no-sandbox") # Penting untuk lingkungan Linux/Docker
-#     chrome_options.add_argument("--disable-dev-shm-usage") # Penting untuk lingkungan Linux/Docker
-#     chrome_options.add_argument("--disable-gpu") # Penting untuk lingkungan headless
-#     chrome_options.add_argument("--window-size=1920,1080")
-#     chrome_options.add_argument("--single-process") # Dapat membantu di beberapa lingkungan cloud
-#     chrome_options.add_argument("--disable-extensions")
-#     chrome_options.add_argument("--disable-plugins")
-#     # chrome_options.add_argument("--disable-images") # Aktifkan jika Anda ingin menghemat bandwidth/memori
-#     # chrome_options.add_argument("--disable-javascript") # Hapus jika Anda membutuhkan JS untuk halaman
-#     chrome_options.add_argument("--remote-debugging-port=9222")
-#     chrome_options.add_argument("--ignore-certificate-errors") # Dapat membantu jika ada masalah SSL
-
-#     user_agents = [
-#         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-#         "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
-#         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-#         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
-#     ]
-#     chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
-#     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-#     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-#     chrome_options.add_experimental_option("useAutomationExtension", False)
-
-#     driver = None
-#     try:
-#         logger.info("Attempting to initialize Chrome WebDriver...")
-#         # Prioritaskan chromedriver yang diinstal sistem (via packages.txt)
-#         system_chromedriver_path = shutil.which('chromedriver') # Cari 'chromedriver' di PATH sistem
-#         if system_chromedriver_path:
-#             logger.info(f"Using system-installed chromedriver at: {system_chromedriver_path}")
-#             service = Service(executable_path=system_chromedriver_path)
-#             driver = webdriver.Chrome(service=service, options=chrome_options)
-#             logger.info("Successfully initialized with system-installed chromedriver.")
-#         else:
-#             logger.warning("System-installed chromedriver not found. Falling back to webdriver-manager.")
-#             # Fallback ke webdriver-manager jika chromedriver sistem tidak ditemukan
-#             driver_path = ChromeDriverManager().install()
-#             service = Service(driver_path)
-#             driver = webdriver.Chrome(service=service, options=chrome_options)
-#             logger.info(f"Successfully initialized with webdriver-manager.")
-
-#         # Anti-detection scripts (tetap dipertahankan)
-#         try:
-#             driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-#                 "source": """
-#                     Object.defineProperty(navigator, 'webdriver', {
-#                         get: () => undefined
-#                     });
-#                     Object.defineProperty(navigator, 'plugins', {
-#                         get: () => [1, 2, 3, 4, 5] // Simulasikan plugin
-#                     });
-#                     Object.defineProperty(navigator, 'languages', {
-#                         get: () => ['en-US', 'en'] // Simulasikan bahasa
-#                     });
-#                     const originalQuery = window.navigator.permissions.query;
-#                     window.navigator.permissions.query = (parameters) => (
-#                         parameters.name === 'notifications' ?
-#                             Promise.resolve({state: Notification.permission}) :
-#                             originalQuery(parameters)
-#                     );
-#                 """
-#             })
-#         except Exception as e:
-#             logger.warning(f"Could not execute anti-detection script: {e}")
-#         return driver
-#     except Exception as e:
-#         logger.error(f"Failed to initialize WebDriver: {e}")
-#         st.error(f"Gagal menginisialisasi WebDriver: {e}")
-#         if driver:
-#             driver.quit() # Pastikan driver ditutup jika terjadi kesalahan
-#         raise
-
-
+from webdriver_manager.core.utils import ChromeType # Penting untuk ChromeType.CHROMIUM
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 # Hanya konfigurasi logging dasar jika belum ada di tempat lain
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') # Komentar atau hapus jika sudah ada di Dashboard.py
+# Jika Anda mengkonfigurasi logging di Dashboard.py, baris ini bisa di-komentar atau dihapus.
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+@st.cache_resource
 def initialize_driver():
-    return webdriver.Chrome(
-        service=Service(
-            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
-        ),
-        options=options,
-    )
-options = Options()
-options.add_argument("--disable-gpu")
-options.add_argument("--headless")
+    """Initialize Selenium WebDriver optimized for Streamlit Cloud."""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new") # Wajib untuk lingkungan tanpa UI, gunakan 'new'
+    chrome_options.add_argument("--no-sandbox") # Penting untuk lingkungan Linux/Docker
+    chrome_options.add_argument("--disable-dev-shm-usage") # Penting untuk lingkungan Linux/Docker
+    chrome_options.add_argument("--disable-gpu") # Penting untuk lingkungan headless
+    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--single-process") # Dapat membantu di beberapa lingkungan cloud
+    chrome_options.add_argument("--disable-extensions")
+    chrome_options.add_argument("--disable-plugins")
+    chrome_options.add_argument("--remote-debugging-port=9222")
+    chrome_options.add_argument("--ignore-certificate-errors")
+
+    # Set lokasi binary Chromium yang diinstal oleh packages.txt
+    chrome_options.binary_location = "/usr/bin/chromium"
+
+    # User-Agent random untuk menghindari deteksi
+    user_agents = [
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
+        "Mofoxzilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
+    ]
+    chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    chrome_options.add_experimental_option("useAutomationExtension", False)
+
+    driver = None
+    try:
+        logger.info("Attempting to initialize Chrome WebDriver...")
+        # Gunakan ChromeDriverManager untuk mengunduh dan menyediakan chromedriver yang cocok
+        service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        logger.info("Successfully initialized Chrome WebDriver.")
+
+        # Anti-detection scripts
+        try:
+            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                "source": """
+                    Object.defineProperty(navigator, 'webdriver', {
+                        get: () => undefined
+                    });
+                    Object.defineProperty(navigator, 'plugins', {
+                        get: () => [1, 2, 3, 4, 5]
+                    });
+                    Object.defineProperty(navigator, 'languages', {
+                        get: () => ['en-US', 'en']
+                    });
+                    const originalQuery = window.navigator.permissions.query;
+                    window.navigator.permissions.query = (parameters) => (
+                        parameters.name === 'notifications' ?
+                            Promise.resolve({state: Notification.permission}) :
+                            originalQuery(parameters)
+                    );
+                """
+            })
+        except Exception as e:
+            logger.warning(f"Could not execute anti-detection script: {e}")
+        return driver
+    except Exception as e:
+        logger.error(f"Failed to initialize WebDriver: {e}")
+        st.error(f"Gagal menginisialisasi WebDriver: {e}")
+        if driver:
+            driver.quit()
+        raise
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
@@ -817,77 +778,63 @@ def scrape_all_reviews(imdb_id, driver, max_pages=None):
 def get_movie_reviews_by_title(movie_title, max_pages=None):
     """Main function to get reviews by movie title using Selenium"""
     logger.info(f"\nSearching for movie: {movie_title}")
-
-    # Panggil initialize_driver tanpa argumen
-    driver = initialize_driver()
-
+    
+    driver = initialize_driver() # Panggil initialize_driver tanpa argumen
+    
     try:
         # Search for the movie
         search_results = search_movie_by_title(movie_title, driver)
-
+        
         if not search_results:
             logger.warning("No movies found matching that title.")
             return None
-
+        
         # Display search results
         print("\nFound the following movies:")
         for i, movie in enumerate(search_results, 1):
             print(f"{i}. {movie['title']} ({movie['year']}) - {movie['imdb_id']}")
-
-        # Let user choose a movie or use first result in automated mode
+        
+        # In Streamlit Cloud, direct input() is not possible.
+        # Auto-select the first result for automated deployments.
         selected_movie = None
-        if len(search_results) == 1:
+        if search_results:
             selected_movie = search_results[0]
-            print(f"Auto-selecting the only result: {selected_movie['title']}")
+            logger.info(f"Auto-selecting the first result: {selected_movie['title']} ({selected_movie['year']})")
         else:
-            try:
-                # Perubahan: Karena di Streamlit Cloud tidak ada input() interaktif,
-                # Anda harus memodifikasi ini untuk memilih secara otomatis
-                # atau menggunakan Streamlit widgets seperti st.selectbox.
-                # Untuk tujuan debugging, mari kita pilih hasil pertama secara default
-                selected_movie = search_results[0]
-                logger.info(f"Auto-selecting the first result: {selected_movie['title']}")
-                
-                # Atau, jika Anda ingin memungkinkan pengguna memilih dalam dashboard Streamlit:
-                # choice_options = [f"{i}. {m['title']} ({m['year']})" for i, m in enumerate(search_results, 1)]
-                # selected_choice_index = st.selectbox("Select a movie:", range(len(choice_options)), format_func=lambda x: choice_options[x])
-                # selected_movie = search_results[selected_choice_index]
-
-            except Exception as e:
-                logger.error(f"Error during movie selection: {e}")
-                return None
-
+            logger.error("No search results to select from.")
+            return None
+        
         imdb_id = selected_movie['imdb_id']
         movie_title = selected_movie['title']
-
+        
         logger.info(f"\nScraping reviews for: {movie_title} ({imdb_id})")
-
+        
         # Scrape reviews for the selected movie
         data = scrape_all_reviews(imdb_id, driver, max_pages)
-
+        
         # Count total reviews
         total_reviews = len(data['reviews'])
-
+        
         logger.info(f"\nFound {total_reviews} reviews for {movie_title}")
-
+        
         # Create directory if it doesn't exist
         os.makedirs("reviews", exist_ok=True)
-
+        
         # Save to JSON file
         sanitized_title = re.sub(r'[\\/*?:"<>|]', "", movie_title.replace(' ', '_'))
         filename = f"reviews/reviews_{imdb_id}_{sanitized_title}.json"
         with open(filename, 'w', encoding='utf-8') as json_file:
             json.dump(data, json_file, ensure_ascii=False, indent=4)
-
+        
         logger.info(f"\nReviews saved to {filename}")
         return data
-
+        
     except Exception as e:
-        logger.error(f"Error in get_movie_reviews_by_title: {e}")
+        logger.error(f"Error: {e}")
         import traceback
         logger.error(traceback.format_exc())
         return None
     finally:
         # Always close the driver when done
-        if driver: # Pastikan driver ada sebelum mencoba menutup
+        if driver:
             driver.quit()
