@@ -11,3 +11,4 @@ selenium
 webdriver-manager
 openai
 nltk
+sklearn
