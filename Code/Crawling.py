@@ -150,77 +150,15 @@ logger.setLevel(logging.INFO)
 
 @st.cache_resource
 def initialize_driver():
-    """Initialize WebDriver optimized for Streamlit Cloud"""
-    chrome_options = Options()
-    chrome_options.add_argument("--headless=new") # Wajib untuk lingkungan tanpa UI, gunakan 'new'
-    chrome_options.add_argument("--no-sandbox") # Penting untuk lingkungan Linux/Docker
-    chrome_options.add_argument("--disable-dev-shm-usage") # Penting untuk lingkungan Linux/Docker
-    chrome_options.add_argument("--disable-gpu") # Penting untuk lingkungan headless
-    chrome_options.add_argument("--window-size=1920,1080")
-    chrome_options.add_argument("--single-process") # Dapat membantu di beberapa lingkungan cloud
-    chrome_options.add_argument("--disable-extensions")
-    chrome_options.add_argument("--disable-plugins")
-    chrome_options.add_argument("--remote-debugging-port=9222")
-    chrome_options.add_argument("--ignore-certificate-errors")
-
-    # Set lokasi binary Chromium yang diinstal oleh packages.txt
-    chrome_options.binary_location = "/usr/bin/chromium"
-
-    # User-Agent random untuk menghindari deteksi
-    user_agents = [
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36"
-    ]
-    chrome_options.add_argument(f"--user-agent={random.choice(user_agents)}")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-    chrome_options.add_experimental_option("useAutomationExtension", False)
-
-    driver = None
-    try:
-        logger.info("Attempting to initialize Chrome WebDriver...")
-        # Gunakan ChromeDriverManager untuk mengunduh dan menyediakan chromedriver yang cocok
-        # Tentukan chrome_type sebagai CHROMIUM
-        service = Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        logger.info("Successfully initialized Chrome WebDriver.")
-
-        # Anti-detection scripts (tetap dipertahankan)
-        try:
-            driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                "source": """
-                    Object.defineProperty(navigator, 'webdriver', {
-                        get: () => undefined
-                    });
-                    Object.defineProperty(navigator, 'plugins', {
-                        get: () => [1, 2, 3, 4, 5] // Simulasikan plugin
-                    });
-                    Object.defineProperty(navigator, 'languages', {
-                        get: () => ['en-US', 'en'] // Simulasikan bahasa
-                    });
-                    const originalQuery = window.navigator.permissions.query;
-                    window.navigator.permissions.query = (parameters) => (
-                        parameters.name === 'notifications' ?
-                            Promise.resolve({state: Notification.permission}) :
-                            originalQuery(parameters)
-                    );
-                """
-            })
-        except Exception as e:
-            logger.warning(f"Could not execute anti-detection script: {e}")
-        return driver
-    except Exception as e:
-        logger.error(f"Failed to initialize WebDriver: {e}")
-        st.error(f"Gagal menginisialisasi WebDriver: {e}")
-        if driver:
-            driver.quit()
-        raise
-
-
-
-    
+    return webdriver.Chrome(
+        service=Service(
+            ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()
+        ),
+        options=options,
+    )
+options = Options()
+options.add_argument("--disable-gpu")
+options.add_argument("--headless")
 
 def random_delay(min_seconds=2, max_seconds=5):
     """Add a random delay between requests to avoid detection"""
