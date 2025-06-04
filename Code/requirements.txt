@@ -1,14 +1,15 @@
-selenium==4.15.2
-webdriver-manager
-streamlit>=1.45.0
+streamlit
+pandas
+json
+os
+time
+plotly-express
+plotly
+wordcloud
+matplotlib
+numpy
 beautifulsoup4
 requests
-pandas>=1.3.0
-plotly>=5.0.0
-nltk>=3.6
-wordcloud>=1.8.1
-matplotlib>=3.4.0
-numpy>=1.21.0
-scikit-learn>=1.0
-openai>=1.0.0
-python-dotenv>=1.0.0
+selenium
+webdriver-manager
+openai # If you use OpenAI API in preprocessing.py
