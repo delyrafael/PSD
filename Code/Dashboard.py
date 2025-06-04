@@ -129,16 +129,33 @@ GLOBAL_API_KEY = None
 if page == "API Assign":
     st.title("Masukan API Key OpenAI")
     api_key = st.text_input("API Key", type="password")
+    # if st.button("Enter"):
+    #     if api_key:
+    #         GLOBAL_API_KEY
+    #         GLOBAL_API_KEY = api_key
+    #         os.environ['OPENAI_API_KEY'] = api_key
+    #         st.success("API Key saved successfully!")
+    #         st.experimental_set_query_params(page="Home")
+    #         st.rerun()
+    #     else:
+    #         st.warning("Please enter your API Key.")
     if st.button("Enter"):
         if api_key:
-            GLOBAL_API_KEY
-            GLOBAL_API_KEY = api_key
-            os.environ['OPENAI_API_KEY'] = api_key
+            # This will set it in the current session
+            st.session_state.openai_api_key_set = True
+            st.session_state.openai_api_key = api_key # Store in session state
+            os.environ['OPENAI_API_KEY'] = api_key # Also set env var for functions expecting it
             st.success("API Key saved successfully!")
-            st.experimental_set_query_params(page="Home")
             st.rerun()
+    else: # For other pages, try to load from session state or secrets
+        if 'openai_api_key' in st.session_state and st.session_state.openai_api_key:
+            GLOBAL_API_KEY = st.session_state.openai_api_key
+            os.environ['OPENAI_API_KEY'] = GLOBAL_API_KEY # Ensure it's set for preposesing
+        elif "OPENAI_API_KEY" in st.secrets:
+            GLOBAL_API_KEY = st.secrets["OPENAI_API_KEY"]
+            os.environ['OPENAI_API_KEY'] = GLOBAL_API_KEY # Ensure it's set for preposesing
         else:
-            st.warning("Please enter your API Key.")
+            st.warning("OpenAI API Key is not set. Summarization features may not work.")
 
 elif page == "Home":
     st.title("Sentiment Analysis and Summarization using LLM")
