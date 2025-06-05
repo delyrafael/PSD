@@ -312,7 +312,7 @@ elif page == "Analisis Movie":
             
             # Jika rating_val adalah 'Unknown', set menjadi 0
             if rating_val == 'Unknown':
-                final_rating = 0
+                final_rating = 1
             else:
                 final_rating = rating_val # Pertahankan nilai rating yang ada
             review_data.append({
