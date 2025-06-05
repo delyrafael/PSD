@@ -108,7 +108,7 @@ if 'loading' not in st.session_state:
 page = st.sidebar.selectbox("Navigate", ["Home", "Crawling Dashboard", "Analisis Movie"])
 logging.getLogger("streamlit.runtime.caching.cache_data_api.CacheDataAPI object at").setLevel(logging.ERROR)
 st.cache_data.clear()
-
+temp_sel = None
 if page == "Home":
     st.title("Sentiment Analysis and Summarization using LLM")
     st.markdown("""
@@ -208,6 +208,7 @@ elif page == "Crawling Dashboard":
                 # Display selected movie poster
                 if selected_movie.get('image_url'):
                     st.image(selected_movie['image_url'], width=150)
+                    temp_sel = selected_movie['image_url'],
                 
                 st.markdown(f"**{selected_movie['title']}** ({selected_movie['year']})")
                 st.text(f"IMDb ID: {selected_movie['imdb_id']}")
@@ -278,7 +279,7 @@ elif page == "Analisis Movie":
             })
         
         df_reviews = pd.DataFrame(review_data)
-        st.image(selected_movie['image_url'], width=150)
+        st.image(temp_sel, width=150)
         # Analytics tabs
         tab1, tab2, tab3, tab4, tab5= st.tabs(["Overview", "Review Text Analysis", "Sentiment Analysis", "Reasoning Review","Raw Data"])
         
