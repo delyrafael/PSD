@@ -19,7 +19,7 @@ from preposesing import (
 
 # Set page configuration
 st.set_page_config(
-    page_title="IMDb Review Scraper",
+    page_title="IMDb Review Analysis Dashboard",
     page_icon="🎬",
     layout="wide",
     initial_sidebar_state="expanded"
