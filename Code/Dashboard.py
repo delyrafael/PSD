@@ -564,19 +564,19 @@ elif page == "Analisis Movie":
             
             with summary_tab1:
                 with st.spinner("Generating overall summary..."):
-                    positive_summary = generate_ai_summary_for_category(GLOBAL_API_KEY, analysis_data, "overall")
+                    positive_summary = generate_ai_summary_for_category(analysis_data, "overall")
                     st.subheader("Overall Analysis")
                     st.write(positive_summary)
             
             with summary_tab2:
                 with st.spinner("Generating positive reviews summary..."):
-                    negative_summary = generate_ai_summary_for_category(GLOBAL_API_KEY,analysis_data, "positive")
+                    negative_summary = generate_ai_summary_for_category(analysis_data, "positive")
                     st.subheader("Positive Reviews Summary")
                     st.write(negative_summary)
             
             with summary_tab3:
                 with st.spinner("Generating negative reviews summary..."):
-                    overall_summary = generate_ai_summary_for_category(GLOBAL_API_KEY, analysis_data, "negative")
+                    overall_summary = generate_ai_summary_for_category(analysis_data, "negative")
                     st.subheader("Negative Reviews Summary")
                     st.write(overall_summary)
             
