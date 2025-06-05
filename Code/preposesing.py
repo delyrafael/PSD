@@ -52,8 +52,7 @@ def generate_wordcloud(text,title= None):
 
 # Load environment variables
 load_dotenv()
-
-
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Download necessary NLTK resources
 nltk.download('punkt', quiet=True)
@@ -143,12 +142,12 @@ def extract_top_tfidf_terms(text_series, top_n=10):
 
     return top_terms
 
-def generate_ai_summary_for_category(api_key, analysis_data, category):
+def generate_ai_summary_for_category( analysis_data, category):
     """Generate an AI summary using OpenAI API based on the analysis data for a specific category"""
     try:
         # Set up OpenAI API client
-        # openai.api_key = os.getenv("OPENAI_API_KEY")
-        openai.api_key = api_key
+        openai.api_key = os.getenv("OPENAI_API_KEY")
+        # openai.api_key = api_key
 
         # Create different prompts based on the category
         if category == "positive":
