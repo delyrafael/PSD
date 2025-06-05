@@ -278,7 +278,7 @@ elif page == "Analisis Movie":
             })
         
         df_reviews = pd.DataFrame(review_data)
-        
+        st.image(selected_movie['image_url'], width=150)
         # Analytics tabs
         tab1, tab2, tab3, tab4, tab5= st.tabs(["Overview", "Review Text Analysis", "Sentiment Analysis", "Reasoning Review","Raw Data"])
         
