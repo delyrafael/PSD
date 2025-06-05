@@ -74,7 +74,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Title and description
-st.markdown("<h1 class='title'>IMDb Review Scraper Dashboard</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>IMDb Review Analysis Dashboard</h1>", unsafe_allow_html=True)
 st.markdown("<p class='subtitle'>Search for movies and analyze their reviews</p>", unsafe_allow_html=True)
 
 
@@ -105,57 +105,9 @@ if 'driver' not in st.session_state:
 if 'loading' not in st.session_state:
     st.session_state.loading = False
 
-
-# if api_key:
-#     # Save the API key to an environment variable
-#     os.environ['OPENAI_API_KEY'] = api_key
-#     st.success("API Key saved successfully!")
-# # Create sidebar for search and options
-# if 'api_key' not in st.session_state:
-#     st.session_state.api_key = ""
-
-# if not st.session_state.api_key:
-#     api_key = st.text_input("API Key", type="password")
-#     if api_key:
-#         st.session_state.api_key = api_key
-#         st.success("API Key saved successfully!")
-# else:
-#     api_key = st.session_state.api_key
-
 page = st.sidebar.selectbox("Navigate", ["Home", "Crawling Dashboard", "Analisis Movie"])
 logging.getLogger("streamlit.runtime.caching.cache_data_api.CacheDataAPI object at").setLevel(logging.ERROR)
 st.cache_data.clear()
-# GLOBAL_API_KEY = None
-# if page == "API Assign":
-#     st.title("Masukan API Key OpenAI")
-#     api_key = st.text_input("API Key", type="password")
-#     # if st.button("Enter"):
-#     #     if api_key:
-#     #         GLOBAL_API_KEY
-#     #         GLOBAL_API_KEY = api_key
-#     #         os.environ['OPENAI_API_KEY'] = api_key
-#     #         st.success("API Key saved successfully!")
-#     #         st.experimental_set_query_params(page="Home")
-#     #         st.rerun()
-#     #     else:
-#     #         st.warning("Please enter your API Key.")
-#     if st.button("Enter"):
-#         if api_key:
-#             # This will set it in the current session
-#             st.session_state.openai_api_key_set = True
-#             st.session_state.openai_api_key = api_key # Store in session state
-#             os.environ['OPENAI_API_KEY'] = api_key # Also set env var for functions expecting it
-#             st.success("API Key saved successfully!")
-#             st.rerun()
-#     else: # For other pages, try to load from session state or secrets
-#         if 'openai_api_key' in st.session_state and st.session_state.openai_api_key:
-#             GLOBAL_API_KEY = st.session_state.openai_api_key
-#             os.environ['OPENAI_API_KEY'] = GLOBAL_API_KEY # Ensure it's set for preposesing
-#         elif "OPENAI_API_KEY" in st.secrets:
-#             GLOBAL_API_KEY = st.secrets["OPENAI_API_KEY"]
-#             os.environ['OPENAI_API_KEY'] = GLOBAL_API_KEY # Ensure it's set for preposesing
-#         else:
-#             st.warning("OpenAI API Key is not set. Summarization features may not work.")
 
 if page == "Home":
     st.title("Sentiment Analysis and Summarization using LLM")
@@ -603,12 +555,11 @@ elif page == "Analisis Movie":
                 key='download-csv'
             )
 
-
 # Footer
 st.markdown("""
 ---
 <div style='text-align: center'>
-    <p>IMDb Review Scraper Dashboard | Built with Streamlit</p>
+    <p>IMDb Review Analysis Dashboard | Built with Streamlit</p>
     <p style='font-size: 12px; color: #888;'>
         This dashboard scrapes data from IMDb for analysis purposes. Please respect IMDb's terms of service.
     </p>
