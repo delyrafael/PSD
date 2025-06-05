@@ -581,7 +581,7 @@ elif page == "Analisis Movie":
                     st.write(overall_summary)
             
             # Display a note about OpenAI API usage
-            st.info("Note: These summaries are generated using OpenAI's API. Make sure you have set your API key in the environment variables for this feature to work properly.")
+            st.info("Note: These summaries are generated using OpenAI's API. It should be noted that the summaries results use the LLM model so further research is needed.")
 
 
         with tab5:
