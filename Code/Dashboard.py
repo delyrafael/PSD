@@ -208,7 +208,7 @@ elif page == "Crawling Dashboard":
                 # Display selected movie poster
                 if selected_movie.get('image_url'):
                     st.image(selected_movie['image_url'], width=150)
-                    temp_sel = selected_movie['image_url'],
+                    temp_sel = selected_movie['image_url']
                 
                 st.markdown(f"**{selected_movie['title']}** ({selected_movie['year']})")
                 st.text(f"IMDb ID: {selected_movie['imdb_id']}")
