@@ -139,6 +139,36 @@ def extract_top_tfidf_terms(text_series, top_n=10):
     top_terms = [(feature_names[idx], avg_tfidf[idx]) for idx in top_indices]
 
     return top_terms
+    
+def analyze_sentiment(text):
+    prompt = f"""
+    Your role: As a sentiment analysis assistant that helps labeling message.
+    Task: Answer with only one of the sentiment labels in the list (["negative", "positive"]) for the given message.
+    STRICT RESTRICTION: You must answer only with either "positive" or "negative". 
+    If uncertain, choose the most likely label based on the overall tone.
+    Message: {text}
+    """
+    
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": "You are a strict sentiment classifier that only outputs 'positive' or 'negative'."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.0
+    )
+     
+    # Extract and strictly validate the sentiment
+    sentiment = response.choices[0].message.content.strip().lower()
+    
+    # Force binary classification
+    if "positive" in sentiment:
+        return "positive"
+    elif "negative" in sentiment:
+        return "negative"
+    
+    # Final fallback to positive for any ambiguous cases
+    return "positive"
 
 def generate_ai_summary_for_category( analysis_data, category):
     """Generate an AI summary using OpenAI API based on the analysis data for a specific category"""
