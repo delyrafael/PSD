@@ -4,7 +4,6 @@ import json
 import os
 import plotly.express as px
 import sys
-from preposesing import generate_ai_summary_for_category
 import pandas as pd
 import re
 import logging
@@ -13,8 +12,8 @@ import contextlib
 from Crawling import (
     initialize_driver, search_movie_by_title, scrape_all_reviews)
 
-from preposesing import (
-    clean_text, generate_wordcloud, categorize_sentiment, analyze_sentiment, extract_common_phrases)
+from AgentBasednSentiment import (
+    clean_text, generate_wordcloud, categorize_sentiment, analyze_sentiment, extract_common_phrases, generate_ai_summary_for_category)
 
 
 # Set page configuration
@@ -117,7 +116,7 @@ if page == "Home":
                 serta mengevaluasi akurasi hasilnya. Sistem ini melalui tahapan akuisisi data, eksplorasi data awal (EDA), preprocessing, 
                 dan penerapan analisis sentimen berbasis agen. Hasil dari analisis sentimen kemudian disajikan dalam bentuk ringkasan menggunakan model LLM
     
-    This tool uses data IMBD, analisis sentimen, summarization, LLM, OpenAI API, , NLP.
+    This tool uses data IMBD, analisis sentimen, summarization, LLM, OpenAI API, NLP.
     """)
 elif page == "Crawling Dashboard":
     st.title("IMDb Review Scraper")

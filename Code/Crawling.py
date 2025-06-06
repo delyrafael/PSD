@@ -1,26 +1,12 @@
 import streamlit as st
-import pandas as pd
 import json
 import os
 import time
-import plotly.express as px
-import plotly.graph_objects as go
-from wordcloud import WordCloud
-import matplotlib.pyplot as plt
-import numpy as np
 import re
-from collections import Counter
-import sys
-import importlib.util
-from io import StringIO
-import contextlib
-
-# --- Konsolidasi semua import di sini ---
 import requests
 from bs4 import BeautifulSoup
 import random
 import logging
-import shutil # Import shutil for get_chromedriver_path
 from datetime import datetime
 
 from selenium import webdriver
@@ -30,7 +16,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
+from selenium.common.exceptions import TimeoutException
 from webdriver_manager.core.os_manager import ChromeType
 
 logger = logging.getLogger(__name__)
