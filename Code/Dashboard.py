@@ -166,7 +166,7 @@ elif page == "Crawling Dashboard":
         with col1:
             # Display movies as compact cards with smaller images
             # Use 3 cards per row
-            movies_per_row = 3
+            movies_per_row = 5
             rows = [st.session_state.search_results[i:i+movies_per_row] 
                     for i in range(0, len(st.session_state.search_results), movies_per_row)]
             
@@ -247,6 +247,22 @@ elif page == "Crawling Dashboard":
 
 elif page == "Analisis Movie":
     st.title("Analisis Movie Reviews")
+    # Add this section to display the movie poster
+    if st.session_state.selected_movie:
+        movie_info = st.session_state.selected_movie
+        col_poster, col_details = st.columns([1, 2])
+        with col_poster:
+            if movie_info.get('image_url'):
+                st.image(movie_info['image_url'], width=200)
+            else:
+                st.markdown("📽️ No poster available.")
+        with col_details:
+            st.markdown(f"**Movie Title:** {movie_info['title']}")
+            st.markdown(f"**Year:** {movie_info['year']}")
+            st.markdown(f"**IMDb ID:** {movie_info['imdb_id']}")
+    else:
+        st.info("Please go to the 'Crawling Dashboard' to search and select a movie first.")
+      
 # Display and analyze reviews if available
     if st.session_state.reviews_data and not st.session_state.loading:
         reviews = st.session_state.reviews_data['reviews']
