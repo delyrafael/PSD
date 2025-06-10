@@ -109,7 +109,7 @@ logging.getLogger("streamlit.runtime.caching.cache_data_api.CacheDataAPI object 
 st.cache_data.clear()
 
 if page == "Home":
-    st.title("Sentiment Analysis and Summarization using LLM")
+    st.header("Sentiment Analysis and Summarization using LLM")
     st.markdown("""
     sistem analisis sentimen berbasis Large Language Model (LLM) menggunakan API OpenAI, 
                 dengan fokus pada ulasan film. Tujuan dari penelitian ini adalah untuk mengembangkan sistem analisis sentimen dan summarization yang efektif,
@@ -119,7 +119,7 @@ if page == "Home":
     This tool uses data IMBD, analisis sentimen, summarization, LLM, OpenAI API, NLP.
     """)
 elif page == "Crawling Dashboard":
-    st.title("IMDb Review Scraper")
+    st.header("IMDb Review Scraper")
 
     with st.sidebar:
         st.header("Search Options")
