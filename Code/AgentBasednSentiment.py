@@ -9,7 +9,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import re
 import openai
-
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 # Function to clean text for analysis
