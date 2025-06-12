@@ -526,7 +526,7 @@ elif page == "Analisis Movie":
             }
             
             # Create tabs for different summaries
-            summary_tab1, summary_tab2, summary_tab3 = st.tabs(["Overall Analysis", "Negative Reviews", "Positive Reviews"])
+            summary_tab1, summary_tab2, summary_tab3 = st.tabs(["Overall Analysis", "Positive Reviews", "Negative Reviews"])
             
             with summary_tab1:
                 with st.spinner("Generating overall summary..."):
