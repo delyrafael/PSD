@@ -341,7 +341,7 @@ elif page == "Analisis Movie":
                     title="Review Sentiment Distribution",
                     color=sentiment_counts.index,
                     color_discrete_map={
-                        'Positive': '#4CAF50',
+                        'Positive': '#55A630',
                         'Negative': '#F44336',
                     }
                 )
